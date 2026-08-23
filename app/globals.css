@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Ansor Edu CRM — dizayn tokenlari.
+  Palette: chuqur "institutional navy" (ishonch, rasmiylik) + tilla urg'u
+  (diplom/sertifikat ruhini eslatadi) — konsalting-agentlik uchun mos.
+*/
+
+@layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 222 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+
+    --primary: 209 56% 16%;        /* #12293F — chuqur navy */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 214 24% 94%;
+    --secondary-foreground: 209 56% 16%;
+
+    --accent: 42 66% 47%;          /* #C9962A — tilla urg'u */
+    --accent-foreground: 222 30% 12%;
+
+    --muted: 214 20% 93%;
+    --muted-foreground: 215 14% 44%;
+
+    --success: 158 64% 28%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 89%;
+    --input: 214 20% 89%;
+    --ring: 209 56% 16%;
+
+    --radius: 0.625rem;
+
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    --font-display: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  .dark {
+    --background: 222 30% 8%;
+    --foreground: 210 20% 96%;
+    --card: 222 26% 11%;
+    --card-foreground: 210 20% 96%;
+    --primary: 210 40% 92%;
+    --primary-foreground: 209 56% 14%;
+    --secondary: 222 20% 16%;
+    --secondary-foreground: 210 20% 96%;
+    --accent: 42 66% 55%;
+    --accent-foreground: 222 30% 10%;
+    --muted: 222 18% 16%;
+    --muted-foreground: 215 14% 65%;
+    --border: 222 18% 20%;
+    --input: 222 18% 20%;
+    --ring: 210 40% 80%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  /* Mobilda tablar/jadval ustidan scroll qilish uchun (native his qilinishi uchun) */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

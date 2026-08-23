@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "clients": "Клиенты",
+    "applications": "Заявки",
+    "payments": "Платежи",
+    "confirmations": "Подтверждения",
+    "documents": "Документы",
+    "notifications": "Уведомления",
+    "reports": "Отчёты",
+    "audit": "Журнал действий",
+    "staff": "Сотрудники",
+    "logout": "Выйти"
+  },
+  "auth": {
+    "loginTitle": "Вход в систему",
+    "loginSubtitle": "Ansor Edu — внутренняя система управления",
+    "password": "Пароль",
+    "loginButton": "Войти",
+    "forgotPassword": "Забыли пароль?",
+    "invalidCredentials": "Неверное имя пользователя или пароль",
+    "email": "Электронная почта"
+  },
+  "roles": {
+    "admin": "Администратор",
+    "manager": "Менеджер",
+    "consultant": "Консультант"
+  },
+  "common": {
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Изменить",
+    "add": "Добавить",
+    "loading": "Загрузка...",
+    "noResults": "Ничего не найдено",
+    "actions": "Действия",
+    "status": "Статус",
+    "date": "Дата",
+    "back": "Назад"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "applications": "Applications",
+    "payments": "Payments",
+    "confirmations": "Confirmations",
+    "documents": "Documents",
+    "notifications": "Notifications",
+    "reports": "Reports",
+    "audit": "Activity Log",
+    "staff": "Staff",
+    "logout": "Log out"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Ansor Edu — internal management system",
+    "password": "Password",
+    "loginButton": "Sign in",
+    "forgotPassword": "Forgot password?",
+    "invalidCredentials": "Invalid username or password",
+    "email": "Email address"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "manager": "Manager",
+    "consultant": "Consultant"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "back": "Back"
+  }
+}

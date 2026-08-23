@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "dashboard": "Bosh sahifa",
+    "clients": "Mijozlar",
+    "applications": "Arizalar",
+    "payments": "To'lovlar",
+    "confirmations": "Tasdiqnomalar",
+    "documents": "Hujjatlar",
+    "notifications": "Bildirishnomalar",
+    "reports": "Hisobotlar",
+    "audit": "Faoliyat tarixi",
+    "staff": "Xodimlar",
+    "logout": "Chiqish"
+  },
+  "auth": {
+    "loginTitle": "Tizimga kirish",
+    "loginSubtitle": "Ansor Edu — ichki boshqaruv tizimi",
+    "password": "Parol",
+    "loginButton": "Kirish",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "invalidCredentials": "Foydalanuvchi nomi yoki parol noto'g'ri",
+    "email": "Email manzil"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "manager": "Menejer",
+    "consultant": "Konsultant"
+  },
+  "common": {
+    "search": "Qidirish",
+    "filter": "Filtr",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "add": "Qo'shish",
+    "loading": "Yuklanmoqda...",
+    "noResults": "Natija topilmadi",
+    "actions": "Amallar",
+    "status": "Holat",
+    "date": "Sana",
+    "back": "Orqaga"
+  }
+}
