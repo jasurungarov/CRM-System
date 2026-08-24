@@ -29,7 +29,7 @@ export function LocaleSwitcher() {
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           align="end"
-          className="min-w-[140px] rounded-md border border-border bg-card p-1 shadow-md"
+          className="min-w-[140px] mt-4 rounded-md border border-border bg-card p-1 shadow-md"
         >
           {routing.locales.map((l) => (
             <DropdownMenu.Item

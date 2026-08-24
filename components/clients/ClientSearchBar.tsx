@@ -1,12 +1,14 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter, usePathname } from "@/i18n/navigation";
-import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 
 export function ClientSearchBar() {
+  const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -27,7 +29,8 @@ export function ClientSearchBar() {
       <Input
         defaultValue={searchParams.get("search") ?? ""}
         onChange={(e) => handleChange(e.target.value)}
-        placeholder="F.I.SH, telefon, email yoki PIN"
+        placeholder={t("clients.searchPlaceholder")}
+        aria-label="Search clients"
         className="pl-9"
       />
     </div>

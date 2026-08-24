@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { reassignClientAction } from "@/actions/clients.actions";
+import { useTranslations } from 'next-intl'
 
 export function ReassignButton({
   clientId,
@@ -23,6 +24,7 @@ export function ReassignButton({
   clientId: string;
   consultants: Array<{ id: string; name: string }>;
 }) {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string>("");
   const [isPending, startTransition] = useTransition();
@@ -49,12 +51,12 @@ export function ReassignButton({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mijozni qayta biriktirish</DialogTitle>
+          <DialogTitle>{t("clients.reassignTitle")}</DialogTitle>
         </DialogHeader>
 
         <Select value={selected} onValueChange={setSelected}>
           <SelectTrigger>
-            <SelectValue placeholder="Yangi konsultant tanlang" />
+            <SelectValue placeholder={t("clients.reassignSelectNew")} />
           </SelectTrigger>
           <SelectContent>
             {consultants.map((c) => (
@@ -67,10 +69,10 @@ export function ReassignButton({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Bekor qilish</Button>
+            <Button variant="outline">{t("common.cancel")}</Button>
           </DialogClose>
           <Button onClick={handleSubmit} disabled={!selected || isPending}>
-            {isPending ? "..." : "Biriktirish"}
+            {isPending ? t("common.loading") : t("clients.reassignButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

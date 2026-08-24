@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { ClientFormModal } from "./ClientFormModal";
+import { CopyablePin } from "./CopyablePin";
 import { ReassignButton } from "./ReassignButton";
 
 type ClientRow = {
@@ -29,10 +30,12 @@ export function ClientList({
   tariffs: Array<{ _id: string; name: string; price: number }>;
   consultants: Array<{ id: string; name: string }>;
 }) {
+  const t = useTranslations();
+
   if (clients.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-        Hozircha mijozlar yo&apos;q
+        {t("clients.noClients")}
       </div>
     );
   }
@@ -42,24 +45,26 @@ export function ClientList({
       {/* Mobil/planshet: kartochkalar ro'yxati */}
       <div className="space-y-3 lg:hidden">
         {clients.map((c) => (
-          <div key={c._id} className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <div
+            key={c._id}
+            className="rounded-lg border border-border bg-card p-4 shadow-sm">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <Link href={`/clients/${c._id}`} className="font-medium hover:underline">
+                <Link
+                  href={`/clients/${c._id}`}
+                  className="font-medium hover:underline">
                   {c.fullName}
                 </Link>
                 <p className="text-sm text-muted-foreground">{c.phone}</p>
               </div>
-              <Badge variant="outline" className="shrink-0 font-mono">
-                {c.pin}
-              </Badge>
+              <CopyablePin pin={c.pin} className="shrink-0" />
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span>{c.tariff?.name ?? "—"}</span>
               <span>•</span>
               <span>{c.assignedToUser?.name ?? "—"}</span>
               <span>•</span>
-              <span>{c.profileCompletionPercent}% to&apos;liq</span>
+              <span>{c.profileCompletionPercent}%</span>
             </div>
             <div className="mt-3 flex items-center gap-1">
               <ClientFormModal
@@ -76,7 +81,9 @@ export function ClientList({
                   assignedTo: c.assignedToUser?.id ?? "",
                 }}
               />
-              {canManage && <ReassignButton clientId={c._id} consultants={consultants} />}
+              {canManage && (
+                <ReassignButton clientId={c._id} consultants={consultants} />
+              )}
             </div>
           </div>
         ))}
@@ -87,29 +94,35 @@ export function ClientList({
         <table className="w-full text-sm">
           <thead className="bg-secondary text-left text-xs uppercase text-muted-foreground">
             <tr>
-              <th className="px-4 py-3 font-medium">F.I.SH</th>
-              <th className="px-4 py-3 font-medium">Telefon</th>
-              <th className="px-4 py-3 font-medium">PIN</th>
-              <th className="px-4 py-3 font-medium">Tarif</th>
-              <th className="px-4 py-3 font-medium">Konsultant</th>
-              <th className="px-4 py-3 font-medium">Profil</th>
-              <th className="px-4 py-3 font-medium text-right">Amallar</th>
+              <th className="px-4 py-3 font-medium">{t("clients.fullName")}</th>
+              <th className="px-4 py-3 font-medium">{t("clients.phone")}</th>
+              <th className="px-4 py-3 font-medium">{t("clients.tablePin")}</th>
+              <th className="px-4 py-3 font-medium">{t("clients.tariff")}</th>
+              <th className="px-4 py-3 font-medium">
+                {t("clients.consultant")}
+              </th>
+              <th className="px-4 py-3 font-medium">
+                {t("clients.tableProfile")}
+              </th>
+              <th className="px-4 py-3 font-medium text-right">
+                {t("clients.tableActions")}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {clients.map((c) => (
               <tr key={c._id} className="hover:bg-secondary/40">
                 <td className="px-4 py-3">
-                  <Link href={`/clients/${c._id}`} className="font-medium hover:underline">
+                  <Link
+                    href={`/clients/${c._id}`}
+                    className="font-medium hover:underline">
                     {c.fullName}
                   </Link>
                   <p className="text-xs text-muted-foreground">{c.email}</p>
                 </td>
                 <td className="px-4 py-3">{c.phone}</td>
                 <td className="px-4 py-3">
-                  <Badge variant="outline" className="font-mono">
-                    {c.pin}
-                  </Badge>
+                  <CopyablePin pin={c.pin} className="shrink-0" />
                 </td>
                 <td className="px-4 py-3">{c.tariff?.name ?? "—"}</td>
                 <td className="px-4 py-3">{c.assignedToUser?.name ?? "—"}</td>
@@ -130,7 +143,12 @@ export function ClientList({
                         assignedTo: c.assignedToUser?.id ?? "",
                       }}
                     />
-                    {canManage && <ReassignButton clientId={c._id} consultants={consultants} />}
+                    {canManage && (
+                      <ReassignButton
+                        clientId={c._id}
+                        consultants={consultants}
+                      />
+                    )}
                   </div>
                 </td>
               </tr>

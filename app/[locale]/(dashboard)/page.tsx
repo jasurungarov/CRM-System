@@ -9,6 +9,7 @@ import { getConfirmations } from "@/actions/confirmations.actions";
 
 export default async function DashboardHomePage() {
   const t = await getTranslations("nav");
+  const td = await getTranslations("dashboard");
   const session = await getSession();
   if (!session) return null;
 
@@ -28,28 +29,28 @@ export default async function DashboardHomePage() {
       label: t("clients"),
       value: clients.length,
       icon: Users,
-      description: `${appStats.total} ta ariza`,
+      description: td("applicationsCount", { count: appStats.total }),
     },
     {
       key: "payments",
       label: t("payments"),
       value: `${totalRevenue.toLocaleString("uz-UZ")} so'm`,
       icon: Wallet,
-      description: `${payments.length} ta to'lov`,
+      description: td("paymentsCount", { count: payments.length }),
     },
     {
       key: "confirmations",
       label: t("confirmations"),
       value: pendingConfirmations,
       icon: FileCheck2,
-      description: "javob kutilmoqda",
+      description: td("awaitingResponse"),
     },
     {
       key: "deadlines",
-      label: "Shoshilinch muddatlar",
+      label: td("urgentDeadlines"),
       value: appStats.urgentDeadlines,
       icon: AlertTriangle,
-      description: `${appStats.expiredDeadlines} ta muddati o'tgan`,
+      description: td("expiredCount", { count: appStats.expiredDeadlines }),
     },
   ];
 
@@ -57,7 +58,7 @@ export default async function DashboardHomePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-display font-semibold sm:text-2xl">{t("dashboard")}</h1>
-        <p className="text-sm text-muted-foreground mt-1">Umumiy ko&apos;rsatkichlar</p>
+        <p className="text-sm text-muted-foreground mt-1">{td("subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

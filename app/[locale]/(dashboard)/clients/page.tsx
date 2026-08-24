@@ -1,9 +1,14 @@
-import { getClients, getTariffsList, getConsultantsList } from "@/actions/clients.actions";
-import { getSession } from "@/lib/auth";
-import { Suspense } from "react";
-import { ClientList } from "@/components/clients/ClientList";
+import {
+  getClients,
+  getConsultantsList,
+  getTariffsList,
+} from "@/actions/clients.actions";
 import { ClientFormModal } from "@/components/clients/ClientFormModal";
+import { ClientList } from "@/components/clients/ClientList";
 import { ClientSearchBar } from "@/components/clients/ClientSearchBar";
+import { getSession } from "@/lib/auth";
+import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 
 export default async function ClientsPage({
   searchParams,
@@ -13,6 +18,8 @@ export default async function ClientsPage({
   const { search } = await searchParams;
   const session = await getSession();
   if (!session) return null;
+
+  const t = await getTranslations("clients");
 
   const canManage = session.role === "admin" || session.role === "manager";
 
@@ -26,8 +33,12 @@ export default async function ClientsPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-display font-semibold sm:text-2xl">Mijozlar</h1>
-          <p className="text-sm text-muted-foreground mt-1">Jami: {clients.length} ta</p>
+          <h1 className="text-xl font-display font-semibold sm:text-2xl">
+            {t("title")}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {t("totalCount")}: {clients.length}
+          </p>
         </div>
         <ClientFormModal
           tariffs={tariffs}
@@ -37,7 +48,10 @@ export default async function ClientsPage({
         />
       </div>
 
-      <Suspense fallback={<div className="h-10 w-full max-w-xs rounded-md bg-secondary animate-pulse" />}>
+      <Suspense
+        fallback={
+          <div className="h-10 w-full max-w-xs rounded-md bg-secondary animate-pulse" />
+        }>
         <ClientSearchBar />
       </Suspense>
 

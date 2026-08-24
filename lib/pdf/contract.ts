@@ -104,12 +104,17 @@ export function downloadContractPdf(data: ContractPdfData) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
   const terms = [
-    "4.1. Ansor Edu Consulting mijozga tanlangan universitet(lar)ga hujjat topshirish, konsultatsiya va vizaga tayyorgarlik bo'yicha xizmat ko'rsatadi.",
-    "4.2. Mijoz tanlangan tarif bo'yicha belgilangan to'lovni o'z vaqtida amalga oshirishga majburdir.",
-    "4.3. Agar ariza universitet tomonidan rad etilsa — to'lov qaytarilmaydi. Agar rad etilish Ansor Edu xodimining aybi bilan bog'liq bo'lsa — mijozga to'liq yoki qisman pul qaytarish (refund) huquqi beriladi.",
-    "4.4. Mijozning shaxsiy ma'lumotlari faqat ariza topshirish jarayoni doirasida ishlatiladi va uchinchi shaxslarga berilmaydi.",
-    "4.5. Ushbu hujjatni elektron tasdiqlash orqali mijoz yuqoridagi barcha shartlarni to'liq o'qib chiqqan va rozi bo'lganini tasdiqlaydi.",
-  ];
+  "4.1. Ansor Edu firmasi mijozga tanlangan universitet(lar)ga hujjatlarni tayyorlash, topshirish va konsultatsiya xizmatlarini ko'rsatadi. Firma xizmati jarayonni professional tashkil etishdan iborat bo'lib, universitet tomonidan qabul qilinishga kafolat bermaydi, chunki qabul qilish qarori to'liq universitetning ichki komissiyasi ixtiyorida.",
+  "",
+  "4.2. Agar mijoz tanlangan universitet(lar)ga qabul qilinmasa, bu firma xizmatining sifatsizligi deb hisoblanmaydi. Mijoz bunday holatda firmaga yoki uning xodimlariga nisbatan haqoratli yoki tuhmat xarakteridagi so'z va ayblovlarni bildirmaslikka rozilik bildiradi.",
+  "",
+  "4.3. To'lovni qaytarish shartlari quyidagicha belgilanadi: 4.3.1. Agar mijozning hujjatlari tanlangan universitet(lar)ga muvaffaqiyatli topshirilgan bo'lsa-yu, universitet komissiyasi qabul qilishdan bosh tortsa — bu holatda mijoz tomonidan to'langan xizmat haqi qaytarilmaydi, chunki firma o'z majburiyatini (topshirish jarayonini to'liq va sifatli tashkil etish) bajargan hisoblanadi. 4.3.2. Agar mijozning arizasi firma xodimi (menejer)ning aybi yoki e'tiborsizligi tufayli belgilangan muddatda universitet(lar)ga topshirilmay qolib ketgan bo'lsa — bu holatda mijoz tomonidan to'langan xizmat haqining to'liq summasi qaytariladi.",
+  "",
+  "",
+  "4.4. Mijoz taqdim etgan barcha ma'lumot va hujjatlarning to'g'riligiga o'zi javobgar bo'lib, noto'g'ri ma'lumot sababli yuzaga kelgan rad javobiga firma javobgar emas. Mijozning shaxsiy ma'lumotlari faqat ariza topshirish jarayoni doirasida ishlatiladi va uchinchi shaxslarga berilmaydi.",
+  "",
+  "4.5. Ushbu hujjatni elektron tasdiqlash orqali mijoz yuqoridagi barcha shartlarni to'liq o'qib chiqqan va rozi bo'lganini tasdiqlaydi.",
+];
   for (const t of terms) {
     doc.text(t, margin, y, { maxWidth: pageWidth - margin * 2 });
     y += 10;

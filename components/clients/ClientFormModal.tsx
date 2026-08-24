@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { createClientAction, updateClientAction, type ClientFormState } from "@/actions/clients.actions";
+import { useTranslations } from 'next-intl'
 
 type Tariff = { _id: string; name: string; price: number };
 type Consultant = { id: string; name: string };
@@ -53,6 +54,7 @@ export function ClientFormModal({
   currentUserId: string;
   client?: ExistingClient;
 }) {
+  const t = useTranslations("clients");
   const [open, setOpen] = useState(false);
   const action = client ? updateClientAction : createClientAction;
   const [state, formAction] = useActionState<ClientFormState, FormData>(action, {});
@@ -71,17 +73,17 @@ export function ClientFormModal({
         ) : (
           <Button>
             <Plus className="h-4 w-4" />
-            Yangi mijoz
+            {t("addNew")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{client ? "Mijozni tahrirlash" : "Yangi mijoz qo'shish"}</DialogTitle>
+          <DialogTitle>{client ? t("editClient") : t("addClient")}</DialogTitle>
           <DialogDescription>
             {client
-              ? "Mijoz ma'lumotlarini yangilang."
-              : "Mijoz qo'shilgach, avtomatik 6 xonali unikal PIN beriladi."}
+              ? t("editClientDesc")
+              : t("addClientDesc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -89,26 +91,26 @@ export function ClientFormModal({
           {client && <input type="hidden" name="clientId" value={client._id} />}
 
           <div className="space-y-1.5">
-            <Label htmlFor="fullName">F.I.SH</Label>
+            <Label htmlFor="fullName">{t("fullName")}</Label>
             <Input id="fullName" name="fullName" defaultValue={client?.fullName} required />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Telefon</Label>
+              <Label htmlFor="phone">{t("phone")}</Label>
               <Input id="phone" name="phone" defaultValue={client?.phone} placeholder="+998" required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input id="email" name="email" type="email" defaultValue={client?.email} required />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Tarif</Label>
+            <Label>{t("tariff")}</Label>
             <Select name="tariffId" defaultValue={client?.tariffId}>
               <SelectTrigger>
-                <SelectValue placeholder="Tarif tanlang" />
+                <SelectValue placeholder={t("selectTariff")} />
               </SelectTrigger>
               <SelectContent>
                 {tariffs.map((t) => (
@@ -122,10 +124,10 @@ export function ClientFormModal({
 
           {canAssign && (
             <div className="space-y-1.5">
-              <Label>Konsultant</Label>
+              <Label>{t("consultant")}</Label>
               <Select name="assignedTo" defaultValue={client?.assignedTo ?? currentUserId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Konsultant tanlang" />
+                  <SelectValue placeholder={t("selectConsultant")} />
                 </SelectTrigger>
                 <SelectContent>
                   {consultants.map((c) => (
@@ -143,10 +145,10 @@ export function ClientFormModal({
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {t("cancel")}
               </Button>
             </DialogClose>
-            <SubmitButton label={client ? "Saqlash" : "Qo'shish"} />
+            <SubmitButton label={client ? t("save") : t("add")} />
           </DialogFooter>
         </form>
       </DialogContent>
