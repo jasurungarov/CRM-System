@@ -9,9 +9,9 @@ import { AuditLog } from "@/models/AuditLog";
 import { requireRole } from "@/lib/auth";
 
 export async function getStaffList() {
-  const session = await requireRole(["admin"]);
+  await requireRole(["admin"]);
   await connectDB();
-  const users = await User.find({}).sort({ createdAt: -1 }).lean();
+  const users = await User.find({ email: { $ne: "system@ansoredu.internal" } }).sort({ createdAt: -1 }).lean();
   return users.map((u) => ({
       _id: String(u._id),
       name: u.name,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runDeadlineScan } from "@/lib/notifications-scanner";
+import { runDeadlineScan, runPaymentReminderScan } from "@/lib/notifications-scanner";
 
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
@@ -10,7 +10,12 @@ export async function GET(request: NextRequest) {
   }
 
   const isVercelCron = request.headers.get("user-agent")?.includes("vercel-cron") ?? false;
-  const result = await runDeadlineScan(isVercelCron ? "vercel_cron" : "manual");
+  const triggeredBy = isVercelCron ? "vercel_cron" : "manual";
 
-  return NextResponse.json({ success: true, result });
+  const [deadlineResult, reminderResult] = await Promise.all([
+    runDeadlineScan(triggeredBy),
+    runPaymentReminderScan(triggeredBy),
+  ]);
+
+  return NextResponse.json({ success: true, deadlineResult, reminderResult });
 }

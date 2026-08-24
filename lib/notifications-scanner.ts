@@ -1,8 +1,10 @@
 import { connectDB } from "@/lib/db";
 import { Client } from "@/models/Client";
+import { Payment } from "@/models/Payment";
 import { Notification } from "@/models/Notification";
+import { AuditLog } from "@/models/AuditLog";
 import { CronJobLog } from "@/models/CronJobLog";
-import { getPaymentSummaryForClient } from "@/lib/payment-summary";
+import { getOrCreateSystemUser } from "@/lib/system-user";
 
 export interface ScanResult {
   success: boolean;
@@ -19,8 +21,6 @@ export interface ScanResult {
  * muddati yaqinlashganda (7 kun) yoki o'tib ketganda bitta marta
  * bildirishnoma yaratadi (Client.universities[].deadlineWarningSent
  * bayrog'i orqali takrorlanishning oldi olinadi).
- *
- * Shuningdek qarzdorligi bor mijozlar bo'yicha ham bildirishnoma yaratadi.
  */
 export async function runDeadlineScan(
   triggeredBy: "vercel_cron" | "manual" | "system" = "manual"
@@ -79,33 +79,6 @@ export async function runDeadlineScan(
     }
 
     if (clientModified) await client.save();
-
-    // Qarzdorlik bildirishnomasi (kunlik bitta marta — sana bo'yicha dedupe)
-    const summary = await getPaymentSummaryForClient(String(client._id));
-    if (summary.remainingDebt > 0) {
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const alreadyNotifiedToday = await Notification.exists({
-        clientId: client._id,
-        type: "payment_debt",
-        createdAt: { $gte: todayStart },
-      });
-      if (!alreadyNotifiedToday) {
-        await Notification.create({
-          recipientId: String(client.assignedTo),
-          recipientRole: "all",
-          clientId: client._id,
-          clientName: client.fullName,
-          clientPin: client.pin,
-          title: `Qarzdorlik: ${client.fullName}`,
-          message: `${client.fullName} (PIN: ${client.pin}) — ${summary.remainingDebt.toLocaleString("uz-UZ")} so'm qarzdorligi bor.`,
-          type: "payment_debt",
-          priority: "orta",
-          link: "/payments",
-          metadata: { amountDue: summary.remainingDebt },
-        });
-        notificationsCreated++;
-      }
-    }
   }
 
   logs.push(
@@ -132,5 +105,83 @@ export async function runDeadlineScan(
     approachingCount,
     details: logs[logs.length - 1],
     logs,
+  };
+}
+
+export interface PaymentReminderResult {
+  success: boolean;
+  clientsScanned: number;
+  remindersCreated: number;
+  details: string;
+}
+
+/**
+ * Hali birorta ham to'lov qilmagan mijozlar bo'yicha HAMMA xodimga
+ * (recipientId:"all") kunlik eslatma yaratadi. Kuniga bir marta (sana
+ * bo'yicha dedupe) va mijoz to'lov qilguncha har kuni takrorlanadi.
+ * Har bir eslatma Audit logga ham "Tizim" hisobi nomidan yoziladi.
+ */
+export async function runPaymentReminderScan(
+  triggeredBy: "vercel_cron" | "manual" | "system" = "manual"
+): Promise<PaymentReminderResult> {
+  await connectDB();
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const clients = await Client.find({}).lean();
+  const systemUser = await getOrCreateSystemUser();
+
+  let remindersCreated = 0;
+
+  for (const client of clients) {
+    const paymentCount = await Payment.countDocuments({
+      clientId: client._id,
+      status: "tasdiqlangan",
+    });
+    if (paymentCount > 0) continue;
+
+    const alreadyRemindedToday = await Notification.exists({
+      clientId: client._id,
+      type: "payment_debt",
+      createdAt: { $gte: todayStart },
+    });
+    if (alreadyRemindedToday) continue;
+
+    await Notification.create({
+      recipientId: "all",
+      recipientRole: "all",
+      clientId: client._id,
+      clientName: client.fullName,
+      clientPin: client.pin,
+      title: `To'lov qilinmagan: ${client.fullName}`,
+      message: `${client.fullName} (PIN: ${client.pin}) hali birorta ham to'lov qilmagan. Mijoz bilan bog'lanib, to'lovni eslatish tavsiya etiladi.`,
+      type: "payment_debt",
+      priority: "yuqori",
+      link: "/payments",
+    });
+
+    await AuditLog.create({
+      action: "notification.payment_reminder",
+      actionTitle: "To'lov eslatmasi yuborildi",
+      category: "payment",
+      severity: "warning",
+      performedBy: {
+        userId: systemUser._id,
+        name: systemUser.name,
+        email: systemUser.email,
+        role: systemUser.role,
+      },
+      targetResource: { type: "Client", id: String(client._id), name: client.fullName },
+      details: `${client.fullName} (PIN: ${client.pin}) hali to'lov qilmagani uchun barcha xodimlarga avtomatik eslatma yuborildi (ishga tushiruvchi: ${triggeredBy})`,
+    });
+
+    remindersCreated++;
+  }
+
+  return {
+    success: true,
+    clientsScanned: clients.length,
+    remindersCreated,
+    details: `${clients.length} ta mijoz tekshirildi, ${remindersCreated} ta eslatma yuborildi.`,
   };
 }

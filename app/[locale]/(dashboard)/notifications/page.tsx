@@ -2,10 +2,12 @@ import { getNotifications } from "@/actions/notifications.actions";
 import { getSession } from "@/lib/auth";
 import { NotificationsListClient } from "@/components/notifications/NotificationsListClient";
 import { ManualScanButton } from "@/components/notifications/ManualScanButton";
+import { BroadcastNotificationModal } from "@/components/notifications/BroadcastNotificationModal";
 
 export default async function NotificationsPage() {
   const [notifications, session] = await Promise.all([getNotifications(100), getSession()]);
   const canRunScan = session?.role === "admin" || session?.role === "manager";
+  const isAdmin = session?.role === "admin";
 
   return (
     <div className="space-y-6">
@@ -13,10 +15,13 @@ export default async function NotificationsPage() {
         <div>
           <h1 className="text-xl font-display font-semibold sm:text-2xl">Bildirishnomalar</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Muddatlar va qarzdorlik bo&apos;yicha avtomatik ogohlantirishlar
+            Muddatlar, qarzdorlik va e&apos;lonlar bo&apos;yicha bildirishnomalar
           </p>
         </div>
-        {canRunScan && <ManualScanButton />}
+        <div className="flex flex-wrap gap-2">
+          {isAdmin && <BroadcastNotificationModal />}
+          {canRunScan && <ManualScanButton />}
+        </div>
       </div>
 
       <NotificationsListClient initialNotifications={notifications as never} />
