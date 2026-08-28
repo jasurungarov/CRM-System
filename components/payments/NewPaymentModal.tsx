@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import {
@@ -22,20 +23,11 @@ import { createPaymentAction, type PaymentFormState } from "@/actions/payments.a
 import { downloadReceiptPdf } from "@/lib/pdf/receipt";
 import { getReceiptData } from "@/actions/payments.actions";
 
-const PAYMENT_METHODS = [
-  { value: "naqd", label: "Naqd" },
-  { value: "karta", label: "Plastik karta" },
-  { value: "bank_otkazma", label: "Bank o'tkazmasi" },
-  { value: "payme", label: "Payme" },
-  { value: "click", label: "Click" },
-  { value: "boshqa", label: "Boshqa" },
-];
-
-function SubmitButton() {
+function SubmitButton({ label, loadingLabel }: { label: string; loadingLabel: string }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "To'lovni qabul qilish"}
+      {pending ? loadingLabel : label}
     </Button>
   );
 }
@@ -43,50 +35,59 @@ function SubmitButton() {
 export function NewPaymentModal({
   clientId,
   clientName,
-  triggerLabel = "Yangi to'lov",
+  triggerLabel,
 }: {
   clientId: string;
   clientName?: string;
   triggerLabel?: string;
 }) {
+  const tPayments = useTranslations("payments");
+  const tCommon = useTranslations("common");
+
   const [open, setOpen] = useState(false);
   const [state, formAction] = useActionState<PaymentFormState, FormData>(createPaymentAction, {});
 
+  const PAYMENT_METHODS = [
+    { value: "naqd", label: tPayments("methodCash") },
+    { value: "karta", label: tPayments("methodCard") },
+    { value: "bank_otkazma", label: tPayments("methodBank") },
+    { value: "payme", label: tPayments("methodPayme") },
+    { value: "click", label: tPayments("methodClick") },
+    { value: "boshqa", label: tPayments("methodOther") },
+  ];
+
   useEffect(() => {
     if (state.success && state.receiptNumber && state.paymentId) {
-      toast.success(`To'lov qabul qilindi: ${state.receiptNumber}`);
+      toast.success(`${tPayments("acceptPayment")}: ${state.receiptNumber}`);
       setOpen(false);
-      getReceiptData(state.paymentId).then(downloadReceiptPdf).catch(() => {
-        // Chek avtomatik yuklanmasa ham to'lov muvaffaqiyatli saqlangan —
-        // foydalanuvchi keyinroq ro'yxatdan PDF tugmasi orqali qayta yuklab olishi mumkin.
-      });
+      getReceiptData(state.paymentId).then(downloadReceiptPdf).catch(() => {});
     }
-  }, [state.success, state.receiptNumber, state.paymentId]);
+  }, [state.success, state.receiptNumber, state.paymentId, tPayments]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4" />
-          {triggerLabel}
+          {triggerLabel ?? tPayments("newPayment")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>To&apos;lov qabul qilish</DialogTitle>
-          <DialogDescription>{clientName ?? "Mijoz uchun yangi to'lov"}</DialogDescription>
+          <DialogTitle>{tPayments("acceptPayment")}</DialogTitle>
+          <DialogDescription>{clientName ?? tPayments("forClientDefault")}</DialogDescription>
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="clientId" value={clientId} />
 
           <div className="space-y-1.5">
-            <Label htmlFor="amount">Summa (UZS)</Label>
-            <Input id="amount" name="amount" type="number" min={1} placeholder="1000000" required />
+            <Label htmlFor="amount">{tPayments("amount").replace("UZS", "$")}</Label>
+            <Input id="amount" name="amount" type="number" min={1} placeholder="100" required />
           </div>
 
           <div className="space-y-1.5">
-            <Label>To&apos;lov usuli</Label>
+            <Label>{tPayments("method")}</Label>
             <Select name="paymentMethod" defaultValue="naqd">
               <SelectTrigger>
                 <SelectValue />
@@ -102,7 +103,9 @@ export function NewPaymentModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="note">Izoh (ixtiyoriy)</Label>
+            <Label htmlFor="note">
+              {tCommon("note")} ({tCommon("optional")})
+            </Label>
             <Input id="note" name="note" />
           </div>
 
@@ -111,10 +114,13 @@ export function NewPaymentModal({
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {tCommon("cancel")}
               </Button>
             </DialogClose>
-            <SubmitButton />
+            <SubmitButton
+              label={tPayments("acceptPayment")}
+              loadingLabel={tCommon("loading")}
+            />
           </DialogFooter>
         </form>
       </DialogContent>

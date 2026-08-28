@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { getClientById } from "@/actions/clients.actions";
 import { getSaudiUniversitiesCatalog } from "@/actions/applications.actions";
 import { getPaymentSummaryForClient } from "@/lib/payment-summary";
@@ -24,6 +25,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const session = await getSession();
   if (!session) return null;
+
+  const tClients = await getTranslations("clients");
 
   const [client, paymentSummary, catalog] = await Promise.all([
     getClientById(id),
@@ -55,52 +58,54 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tarif</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tClients("detailTariff")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">{client.tariff?.name ?? "—"}</p>
             <p className="text-xs text-muted-foreground">
-              {client.tariff?.price?.toLocaleString("uz-UZ")} so&apos;m
+              ${client.tariff?.price?.toLocaleString("en-US") ?? 0}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">To&apos;langan</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tClients("detailPaid")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{paymentSummary.totalPaid.toLocaleString("uz-UZ")}</p>
-            <p className="text-xs text-muted-foreground">so&apos;m</p>
+            <p className="text-lg font-semibold">${paymentSummary.totalPaid.toLocaleString("en-US")}</p>
+            <p className="text-xs text-muted-foreground">USD</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Qarzdorlik</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tClients("detailDebt")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{paymentSummary.remainingDebt.toLocaleString("uz-UZ")}</p>
-            <p className="text-xs text-muted-foreground">so&apos;m</p>
+            <p className="text-lg font-semibold">${paymentSummary.remainingDebt.toLocaleString("en-US")}</p>
+            <p className="text-xs text-muted-foreground">USD</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Konsultant</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{tClients("detailConsultant")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">{client.assignedToUser?.name ?? "—"}</p>
-            <p className="text-xs text-muted-foreground">{client.profileCompletionPercent}% profil</p>
+            <p className="text-xs text-muted-foreground">
+              {tClients("profileCompletion", { percent: client.profileCompletionPercent })}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle>Universitet arizalari</CardTitle>
+          <CardTitle>{tClients("universityApplications")}</CardTitle>
           <AddApplicationModal clientId={client._id} catalog={catalog} />
         </CardHeader>
         <CardContent className="space-y-3">
           {client.universities.length === 0 && (
-            <p className="text-sm text-muted-foreground">Hozircha ariza qo&apos;shilmagan</p>
+            <p className="text-sm text-muted-foreground">{tClients("noApplicationsYet")}</p>
           )}
           {client.universities.map((uni) => {
             const { daysLeft, urgency } = computeUrgency(new Date(uni.submissionDeadline));

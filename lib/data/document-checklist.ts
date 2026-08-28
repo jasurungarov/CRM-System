@@ -20,12 +20,6 @@ export const DOCUMENT_CHECKLIST_TEMPLATE: Array<{
     isRequired: true,
   },
   {
-    docType: "metrika",
-    title: "Tug'ilganlik haqida guvohnoma (Metrika)",
-    description: "Asl nusxasi va arab tiliga notarial tasdiqlangan tarjimasi.",
-    isRequired: true,
-  },
-  {
     docType: "tibbiy_malumotnoma",
     title: "Tibbiy ma'lumotnoma (086-U / Yuqumli kasalliklar tahlili)",
     description: "OITS (OIV), Gepatit B va C, Sil (fluorografiya) yo'qligi to'g'risida rasmiy poliklinika xulosasi.",
@@ -45,14 +39,8 @@ export const DOCUMENT_CHECKLIST_TEMPLATE: Array<{
   },
   {
     docType: "tavsiyanoma_1",
-    title: "1-Tavsiyanoma (Tavsiya xati)",
-    description: "Maktab, litsey direktori, universitet o'qituvchisi yoki ilmiy rahbar tomonidan.",
-    isRequired: true,
-  },
-  {
-    docType: "tavsiyanoma_2",
-    title: "2-Tavsiyanoma (Tavsiya xati / Masjiddan)",
-    description: "Imom-xatib, masjid, ma'naviyat ustozi yoki soha mutaxassisi tomonidan tavsiya xati.",
+    title: "Tavsiyanoma (Tavsiya xati)",
+    description: "Imom-xatib, masjid, maktab, litsey yoki universitet o'qituvchisi yoki ilmiy rahbar tomonidan.",
     isRequired: true,
   },
   {

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Send, Copy, ExternalLink } from "lucide-react";
 import {
@@ -20,50 +21,55 @@ import { Label } from "@/components/ui/label";
 import { createConfirmationAction, type ConfirmationFormState } from "@/actions/confirmations.actions";
 import { buildTelegramShareUrl } from "@/lib/telegram";
 
-function SubmitButton() {
+function SubmitButton({ label, loadingLabel }: { label: string; loadingLabel: string }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "Shartnoma yaratish"}
+      {pending ? loadingLabel : label}
       <Send className="h-4 w-4" />
     </Button>
   );
 }
 
 export function SendConfirmationModal({ clientId, clientName }: { clientId: string; clientName: string }) {
+  const t = useTranslations("confirmations");
+  const tCommon = useTranslations("common");
+
   const [open, setOpen] = useState(false);
   const [state, formAction] = useActionState<ConfirmationFormState, FormData>(createConfirmationAction, {});
 
   useEffect(() => {
-    if (state.success) toast.success("Shartnoma-tasdiqnoma yaratildi");
-  }, [state.success]);
+    if (state.success) toast.success(t("created"));
+  }, [state.success, t]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm">
           <Send className="h-4 w-4" />
-          Shartnoma yuborish
+          {t("send")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Shartnoma-tasdiqnoma yuborish</DialogTitle>
-          <DialogDescription>{clientName} uchun rasmiy shartnoma yaratiladi (14 kun amal qiladi)</DialogDescription>
+          <DialogTitle>{t("createTitle")}</DialogTitle>
+          <DialogDescription>{t("createDesc", { clientName })}</DialogDescription>
         </DialogHeader>
 
         {!state.confirmationUrl ? (
           <form action={formAction} className="space-y-4">
             <input type="hidden" name="clientId" value={clientId} />
             <div className="space-y-1.5">
-              <Label htmlFor="telegramChatId">Mijozning Telegram Chat ID (ixtiyoriy)</Label>
+              <Label htmlFor="telegramChatId">{t("telegramChatId")}</Label>
               <Input id="telegramChatId" name="telegramChatId" placeholder="masalan: 123456789" />
               <p className="text-xs text-muted-foreground">
-                Bo&apos;sh qoldirilsa, havolani o&apos;zingiz Telegram orqali ulashishingiz mumkin bo&apos;ladi.
+                {t("telegramHint")}
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="notes">Izoh (ixtiyoriy)</Label>
+              <Label htmlFor="notes">
+                {tCommon("note")} ({tCommon("optional")})
+              </Label>
               <Input id="notes" name="notes" />
             </div>
 
@@ -72,10 +78,13 @@ export function SendConfirmationModal({ clientId, clientName }: { clientId: stri
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">
-                  Bekor qilish
+                  {tCommon("cancel")}
                 </Button>
               </DialogClose>
-              <SubmitButton />
+              <SubmitButton
+                label={t("createButton")}
+                loadingLabel={tCommon("loading")}
+              />
             </DialogFooter>
           </form>
         ) : (
@@ -95,6 +104,9 @@ function ConfirmationLinkResult({
   confirmationUrl: string;
   onClose: () => void;
 }) {
+  const t = useTranslations("confirmations");
+  const tCommon = useTranslations("common");
+
   const shareText = `${clientName} uchun Ansor Edu shartnoma-tasdiqnomasi. Iltimos, havola orqali tasdiqlang:`;
   const telegramShareUrl = buildTelegramShareUrl(confirmationUrl, shareText);
 
@@ -109,22 +121,22 @@ function ConfirmationLinkResult({
           className="flex-1"
           onClick={() => {
             navigator.clipboard.writeText(confirmationUrl);
-            toast.success("Havola nusxalandi");
+            toast.success(t("linkCopied"));
           }}
         >
           <Copy className="h-4 w-4" />
-          Nusxalash
+          {t("copyLink")}
         </Button>
         <Button asChild className="flex-1">
           <a href={telegramShareUrl} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="h-4 w-4" />
-            Telegramda yuborish
+            {t("sendViaTelegram")}
           </a>
         </Button>
       </div>
       <DialogFooter>
         <Button variant="ghost" onClick={onClose} className="w-full sm:w-auto">
-          Yopish
+          {tCommon("close")}
         </Button>
       </DialogFooter>
     </div>

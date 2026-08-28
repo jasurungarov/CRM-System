@@ -25,12 +25,10 @@ export type PaymentStatus = "tasdiqlangan" | "kutilmoqda" | "bekor_qilingan";
 export type DocumentType =
   | "pasport"
   | "attestat_diplom"
-  | "metrika"
   | "tibbiy_malumotnoma"
   | "sudlanmaganlik"
   | "foto_3x4"
   | "tavsiyanoma_1"
-  | "tavsiyanoma_2"
   | "tarjimai_hol"
   | "til_sertifikati"
   | "boshqa";

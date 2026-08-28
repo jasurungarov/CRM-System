@@ -34,7 +34,7 @@ export default async function DashboardHomePage() {
     {
       key: "payments",
       label: t("payments"),
-      value: `${totalRevenue.toLocaleString("uz-UZ")} so'm`,
+      value: `${totalRevenue.toLocaleString("USD")} $`,
       icon: Wallet,
       description: td("paymentsCount", { count: payments.length }),
     },

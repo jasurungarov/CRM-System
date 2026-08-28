@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import {
   Dialog,
@@ -25,9 +26,11 @@ import type { SaudiUniversity } from "@/lib/data/saudi-universities";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const tCommon = useTranslations("common");
+
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "Qo'shish"}
+      {pending ? tCommon("loading") : tCommon("add")}
     </Button>
   );
 }
@@ -39,6 +42,9 @@ export function AddApplicationModal({
   clientId: string;
   catalog: SaudiUniversity[];
 }) {
+  const tApps = useTranslations("applications");
+  const tCommon = useTranslations("common");
+
   const [open, setOpen] = useState(false);
   const [selectedUni, setSelectedUni] = useState<string>("custom");
   const [state, formAction] = useActionState<ApplicationFormState, FormData>(
@@ -57,14 +63,14 @@ export function AddApplicationModal({
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <Plus className="h-4 w-4" />
-          Universitet qo&apos;shish
+          {tApps("addApplication")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Universitetga ariza qo&apos;shish</DialogTitle>
+          <DialogTitle>{tApps("addApplication")}</DialogTitle>
           <DialogDescription>
-            Katalogdan tanlang yoki qo&apos;lda kiriting.
+            {tApps("addApplicationTitle")}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,13 +78,13 @@ export function AddApplicationModal({
           <input type="hidden" name="clientId" value={clientId} />
 
           <div className="space-y-1.5">
-            <Label>Katalogdan tanlash</Label>
+            <Label>{tApps("addApplicationDesc")}</Label>
             <Select value={selectedUni} onValueChange={setSelectedUni}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="custom">Qo&apos;lda kiritish</SelectItem>
+                <SelectItem value="custom">{tApps("manualEntry")}</SelectItem>
                 {catalog.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
                     {u.name}
@@ -89,7 +95,7 @@ export function AddApplicationModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="universityName">Universitet nomi</Label>
+            <Label htmlFor="universityName">{tApps("universityName")}</Label>
             <Input
               id="universityName"
               name="universityName"
@@ -101,7 +107,7 @@ export function AddApplicationModal({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="country">Davlat</Label>
+              <Label htmlFor="country">{tApps("country")}</Label>
               <Input
                 id="country"
                 name="country"
@@ -110,7 +116,7 @@ export function AddApplicationModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="submissionDeadline">Topshirish muddati</Label>
+              <Label htmlFor="submissionDeadline">{tApps("submissionDeadline")}</Label>
               <Input
                 id="submissionDeadline"
                 name="submissionDeadline"
@@ -123,7 +129,7 @@ export function AddApplicationModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="program">Yo&apos;nalish (dastur)</Label>
+            <Label htmlFor="program">{tApps("program")}</Label>
             <Input
               id="program"
               name="program"
@@ -138,7 +144,7 @@ export function AddApplicationModal({
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {tCommon("cancel")}
               </Button>
             </DialogClose>
             <SubmitButton />

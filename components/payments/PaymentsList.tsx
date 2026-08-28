@@ -1,23 +1,25 @@
+import { getTranslations } from "next-intl/server";
 import { getPayments } from "@/actions/payments.actions";
 import { Badge } from "@/components/ui/badge";
 import { ReceiptPdfButton } from "./ReceiptPdfButton";
 
-const METHOD_LABELS: Record<string, string> = {
-  naqd: "Naqd",
-  karta: "Karta",
-  bank_otkazma: "Bank o'tkazma",
-  payme: "Payme",
-  click: "Click",
-  boshqa: "Boshqa",
-};
-
 export async function PaymentsList() {
+  const t = await getTranslations("payments");
   const payments = await getPayments();
+
+  const METHOD_LABELS: Record<string, string> = {
+    naqd: t("methodCash"),
+    karta: t("methodCard"),
+    bank_otkazma: t("methodBank"),
+    payme: t("methodPayme"),
+    click: t("methodClick"),
+    boshqa: t("methodOther"),
+  };
 
   if (payments.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-        Hozircha to&apos;lovlar yo&apos;q
+        {t("noPayments")}
       </div>
     );
   }
@@ -46,12 +48,12 @@ export async function PaymentsList() {
         <table className="w-full text-sm">
           <thead className="bg-secondary text-left text-xs uppercase text-muted-foreground">
             <tr>
-              <th className="px-4 py-3 font-medium">Kvitansiya</th>
-              <th className="px-4 py-3 font-medium">Mijoz</th>
-              <th className="px-4 py-3 font-medium">Summa</th>
-              <th className="px-4 py-3 font-medium">Usul</th>
-              <th className="px-4 py-3 font-medium">Sana</th>
-              <th className="px-4 py-3 font-medium text-right">Chek</th>
+              <th className="px-4 py-3 font-medium">{t("tableReceipt")}</th>
+              <th className="px-4 py-3 font-medium">{t("tableClient")}</th>
+              <th className="px-4 py-3 font-medium">{t("tableSum")}</th>
+              <th className="px-4 py-3 font-medium">{t("tableMethod")}</th>
+              <th className="px-4 py-3 font-medium">{t("tableDate")}</th>
+              <th className="px-4 py-3 font-medium text-right">{t("tableReceiptCol")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

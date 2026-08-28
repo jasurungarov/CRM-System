@@ -3,17 +3,17 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GraduationCap } from "lucide-react";
 import { signInAction, type SignInState } from "@/actions/auth.actions";
 
 function SubmitButton({ label }: { label: string }) {
+  const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "..." : label}
+      {pending ? t('loading') : label}
     </Button>
   );
 }
@@ -59,11 +59,12 @@ export function LoginForm() {
 
           <SubmitButton label={t("loginButton")} />
 
-          <div className="text-center">
+          {/* <div className="text-center">
             <Link href="/forgot-password" className="text-sm text-primary hover:underline">
               {t("forgotPassword")}
             </Link>
-          </div>
+          </div> */}
+
         </form>
       </div>
     </div>

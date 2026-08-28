@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations, useFormatter } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -25,16 +26,23 @@ const SEVERITY_CONFIG: Record<string, { variant: "secondary" | "accent" | "destr
   critical: { variant: "destructive" },
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  auth: "Kirish/Chiqish",
-  client: "Mijoz",
-  payment: "To'lov",
-  application: "Ariza",
-  document: "Hujjat",
-  confirmation: "Shartnoma",
-  staff: "Xodim",
-  system: "Tizim",
-};
+const CATEGORIES = [
+  { key: "auth", translationKey: "categoryAuth" },
+  { key: "client", translationKey: "categoryClient" },
+  { key: "payment", translationKey: "categoryPayment" },
+  { key: "application", translationKey: "categoryApplication" },
+  { key: "document", translationKey: "categoryDocument" },
+  { key: "confirmation", translationKey: "categoryConfirmation" },
+  { key: "staff", translationKey: "categoryStaff" },
+  { key: "system", translationKey: "categorySystem" },
+] as const;
+
+const SEVERITIES = [
+  { key: "info", translationKey: "severityInfo" },
+  { key: "warning", translationKey: "severityWarning" },
+  { key: "danger", translationKey: "severityDanger" },
+  { key: "critical", translationKey: "severityCritical" },
+] as const;
 
 export function AuditLogList({
   logs,
@@ -47,6 +55,10 @@ export function AuditLogList({
   severity: string;
   search: string;
 }) {
+  const tAudit = useTranslations("audit");
+  const tRoles = useTranslations("roles");
+  const format = useFormatter();
+
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
@@ -60,6 +72,20 @@ export function AuditLogList({
     startTransition(() => router.replace(`${pathname}?${params.toString()}`));
   }
 
+  const getCategoryLabel = (catKey: string) => {
+    const match = CATEGORIES.find((c) => c.key === catKey);
+    return match ? tAudit(match.translationKey as never) : catKey;
+  };
+
+  const getSeverityLabel = (sevKey: string) => {
+    const match = SEVERITIES.find((s) => s.key === sevKey);
+    return match ? tAudit(match.translationKey as never) : sevKey;
+  };
+
+  const getRoleLabel = (roleKey: string) => {
+    return tRoles.has(roleKey) ? tRoles(roleKey) : roleKey;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -70,33 +96,36 @@ export function AuditLogList({
             onChange={(e) => setLocalSearch(e.target.value)}
             onBlur={() => updateParams({ search: localSearch })}
             onKeyDown={(e) => e.key === "Enter" && updateParams({ search: localSearch })}
-            placeholder="Qidirish..."
+            placeholder={tAudit("searchPlaceholder")}
             className="pl-9"
           />
         </div>
+
         <Select value={category} onValueChange={(v) => updateParams({ category: v })}>
           <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Kategoriya" />
+            <SelectValue placeholder={tAudit("categoryLabel")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Barcha kategoriyalar</SelectItem>
-            {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
+            <SelectItem value="all">{tAudit("allCategories")}</SelectItem>
+            {CATEGORIES.map((cat) => (
+              <SelectItem key={cat.key} value={cat.key}>
+                {tAudit(cat.translationKey as never)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+
         <Select value={severity} onValueChange={(v) => updateParams({ severity: v })}>
           <SelectTrigger className="w-full sm:w-40">
-            <SelectValue placeholder="Daraja" />
+            <SelectValue placeholder={tAudit("severityLabel")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Barcha darajalar</SelectItem>
-            <SelectItem value="info">Info</SelectItem>
-            <SelectItem value="warning">Ogohlantirish</SelectItem>
-            <SelectItem value="danger">Xavfli</SelectItem>
-            <SelectItem value="critical">Kritik</SelectItem>
+            <SelectItem value="all">{tAudit("allSeverities")}</SelectItem>
+            {SEVERITIES.map((sev) => (
+              <SelectItem key={sev.key} value={sev.key}>
+                {tAudit(sev.translationKey as never)}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -104,7 +133,7 @@ export function AuditLogList({
       <div className="space-y-2">
         {logs.length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            Yozuvlar topilmadi
+            {tAudit("noEntries")}
           </div>
         )}
         {logs.map((log) => (
@@ -115,12 +144,21 @@ export function AuditLogList({
                 <p className="mt-0.5 text-sm text-muted-foreground">{log.details}</p>
               </div>
               <div className="flex items-center gap-1.5">
-                <Badge variant="outline">{CATEGORY_LABELS[log.category] ?? log.category}</Badge>
-                <Badge variant={SEVERITY_CONFIG[log.severity]?.variant ?? "secondary"}>{log.severity}</Badge>
+                <Badge variant="outline">{getCategoryLabel(log.category)}</Badge>
+                <Badge variant={SEVERITY_CONFIG[log.severity]?.variant ?? "secondary"}>
+                  {getSeverityLabel(log.severity)}
+                </Badge>
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              {log.performedBy.name} ({log.performedBy.role}) · {new Date(log.createdAt).toLocaleString("uz-UZ")}
+              {log.performedBy.name} ({getRoleLabel(log.performedBy.role)}) ·{" "}
+              {format.dateTime(new Date(log.createdAt), {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })}
             </p>
           </div>
         ))}

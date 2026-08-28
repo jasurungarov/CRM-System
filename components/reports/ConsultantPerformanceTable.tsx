@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations, useFormatter } from "next-intl";
+
 type ConsultantPerf = {
   consultantId: string;
   consultantName: string;
@@ -8,16 +12,19 @@ type ConsultantPerf = {
 };
 
 export function ConsultantPerformanceTable({ data }: { data: ConsultantPerf[] }) {
+  const tReports = useTranslations("reports");
+  const format = useFormatter();
+
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-sm">
         <thead className="bg-secondary text-left text-xs uppercase text-muted-foreground">
           <tr>
-            <th className="px-4 py-3 font-medium">Konsultant</th>
-            <th className="px-4 py-3 font-medium">Mijozlar</th>
-            <th className="px-4 py-3 font-medium">Arizalar</th>
-            <th className="px-4 py-3 font-medium">Qabul qilindi</th>
-            <th className="px-4 py-3 font-medium">Tushum</th>
+            <th className="px-4 py-3 font-medium">{tReports("tableConsultant")}</th>
+            <th className="px-4 py-3 font-medium">{tReports("tableClients")}</th>
+            <th className="px-4 py-3 font-medium">{tReports("tableApplications")}</th>
+            <th className="px-4 py-3 font-medium">{tReports("tableAccepted")}</th>
+            <th className="px-4 py-3 font-medium">{tReports("tableRevenue")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -27,7 +34,9 @@ export function ConsultantPerformanceTable({ data }: { data: ConsultantPerf[] })
               <td className="px-4 py-3">{c.clientsCount}</td>
               <td className="px-4 py-3">{c.applicationsCount}</td>
               <td className="px-4 py-3">{c.acceptedCount}</td>
-              <td className="px-4 py-3">{c.revenue.toLocaleString("uz-UZ")} so&apos;m</td>
+              <td className="px-4 py-3">
+                {format.number(c.revenue, { style: "currency", currency: "USD", maximumFractionDigits: 0 })}
+              </td>
             </tr>
           ))}
         </tbody>

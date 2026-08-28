@@ -1,10 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
-import * as XLSX from "xlsx";
-import { toast } from "sonner";
-import { FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FileSpreadsheet } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 export function ExcelExportButton({
   label,
@@ -17,6 +18,8 @@ export function ExcelExportButton({
   sheetName: string;
   fetchData: () => Promise<Record<string, unknown>[]>;
 }) {
+  const tReports = useTranslations("reports");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   function handleClick() {
@@ -24,7 +27,7 @@ export function ExcelExportButton({
       try {
         const data = await fetchData();
         if (data.length === 0) {
-          toast.error("Eksport qilish uchun ma'lumot topilmadi");
+          toast.error(tReports("noDataToExport"));
           return;
         }
         const worksheet = XLSX.utils.json_to_sheet(data);
@@ -32,15 +35,21 @@ export function ExcelExportButton({
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
         XLSX.writeFile(workbook, `${fileName}.xlsx`);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Eksport qilishda xatolik");
+        toast.error(
+          err instanceof Error ? err.message : tReports("exportError"),
+        );
       }
     });
   }
 
   return (
-    <Button variant="secondary" size="sm" onClick={handleClick} disabled={isPending}>
+    <Button
+      variant="secondary"
+      size="sm"
+      onClick={handleClick}
+      disabled={isPending}>
       <FileSpreadsheet className="h-4 w-4" />
-      {isPending ? "..." : label}
+      {isPending ? tCommon("loading") : label}
     </Button>
   );
 }

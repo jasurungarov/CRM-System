@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import {
@@ -18,6 +19,9 @@ import { Label } from "@/components/ui/label";
 import { addCustomDocumentAction } from "@/actions/documents.actions";
 
 export function AddCustomDocumentButton({ clientId }: { clientId: string }) {
+  const tDocs = useTranslations("documents");
+  const tCommon = useTranslations("common");
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -25,18 +29,18 @@ export function AddCustomDocumentButton({ clientId }: { clientId: string }) {
 
   function handleSubmit() {
     if (!title.trim()) {
-      toast.error("Hujjat nomini kiriting");
+      toast.error(tDocs("docNameRequired"));
       return;
     }
     startTransition(async () => {
       try {
         await addCustomDocumentAction(clientId, title, description);
-        toast.success("Hujjat qo'shildi");
+        toast.success(tDocs("added"));
         setOpen(false);
         setTitle("");
         setDescription("");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Xatolik yuz berdi");
+        toast.error(err instanceof Error ? err.message : tCommon("errorOccurred"));
       }
     });
   }
@@ -46,20 +50,27 @@ export function AddCustomDocumentButton({ clientId }: { clientId: string }) {
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <Plus className="h-4 w-4" />
-          Qo&apos;shimcha hujjat
+          {tDocs("addCustom")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Qo&apos;shimcha hujjat qo&apos;shish</DialogTitle>
+          <DialogTitle>{tDocs("addCustomTitle")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="customDocTitle">Hujjat nomi</Label>
-            <Input id="customDocTitle" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <Label htmlFor="customDocTitle">{tDocs("docName")}</Label>
+            <Input
+              id="customDocTitle"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="customDocDescription">Izoh (ixtiyoriy)</Label>
+            <Label htmlFor="customDocDescription">
+              {tCommon("note")} {tDocs("optionalTag")}
+            </Label>
             <Input
               id="customDocDescription"
               value={description}
@@ -69,10 +80,10 @@ export function AddCustomDocumentButton({ clientId }: { clientId: string }) {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Bekor qilish</Button>
+            <Button variant="outline">{tCommon("cancel")}</Button>
           </DialogClose>
           <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "..." : "Qo'shish"}
+            {isPending ? tCommon("loading") : tCommon("add")}
           </Button>
         </DialogFooter>
       </DialogContent>

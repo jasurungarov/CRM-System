@@ -65,7 +65,8 @@
     "expired": "Muddati o'tgan",
     "urgent": "Shoshilinch",
     "warning": "Diqqat",
-    "normal": "Normal"
+    "normal": "Normal",
+    "day": "kun"
   },
   "clients": {
     "title": "Mijozlar",
@@ -247,7 +248,42 @@
     "statusAccepted": "Qabul qilindi",
     "statusRejected": "Rad etildi",
     "pendingReview": "{count} tekshiruvda",
-    "rejectedCount": "{count} rad etilgan"
+    "rejectedCount": "{count} rad etilgan",
+    
+    "template": {
+    "pasport": {
+      "title": "Xorijga chiqish pasporti (Zagran pasport)",
+      "description": "Amal qilish muddati kamida 2 yil bo'lishi lozim. Asl nusxa va to'liq skaneri."
+    },
+    "attestat_diplom": {
+      "title": "Attestat / Diplom va Baholar ilovasi",
+      "description": "Maktab attestati yoki kollej/litsey diplomi. Arab tiliga notarial tasdiqlangan tarjimasi va apostili bilan."
+    },
+    "tibbiy_malumotnoma": {
+      "title": "Tibbiy ma'lumotnoma (086-U / Yuqumli kasalliklar tahlili)",
+      "description": "OITS (OIV), Gepatit B va C, Sil (fluorografiya) yo'qligi to'g'risida rasmiy poliklinika xulosasi."
+    },
+    "sudlanmaganlik": {
+      "title": "Sudlanmaganlik haqida ma'lumotnoma",
+      "description": "Yagona darcha (my.gov.uz) yoki IIV tomonidan berilgan va arabchaga notarial tarjima qilingan."
+    },
+    "foto_3x4": {
+      "title": "3x4 (yoki 4x6) Oq fondagi fotosurat",
+      "description": "Yaqin 3 oy ichida olingan, oq fonda, yorug' va sifatli elektron fotosurat."
+    },
+    "tavsiyanoma_1": {
+      "title": "Tavsiyanoma (Tavsiya xati)",
+      "description": "Imom-xatib, masjid, maktab, litsey yoki universitet o'qituvchisi yoki ilmiy rahbar tomonidan."
+    },
+    "tarjimai_hol": {
+      "title": "Tarjimai hol (CV / Resume / Motivatsion xat)",
+      "description": "Talabaning qiziqishlari, ta'lim maqsadi va Saudiya grantiga nega munosibligi haqidagi bayonot."
+    },
+    "til_sertifikati": {
+      "title": "Arab tili / Ingliz tili sertifikati",
+      "description": "IELTS, CEFR yoki boshqa til sertifikatlari (ixtiyoriy, lekin grant olish imkoniyatini oshiradi)."
+    }
+  }
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -304,7 +340,7 @@
   },
   "staff": {
     "title": "Xodimlar",
-    "totalCount": "Jami: {count} ta",
+    "totalCount": "Jami:",
     "addNew": "Yangi xodim",
     "addTitle": "Yangi xodim qo'shish",
     "fullName": "F.I.SH",

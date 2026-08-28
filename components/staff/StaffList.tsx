@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,22 +16,19 @@ type StaffRow = {
   isActive: boolean;
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Administrator",
-  manager: "Menejer",
-  consultant: "Konsultant",
-};
-
 export function StaffList({ staff, currentUserId }: { staff: StaffRow[]; currentUserId: string }) {
+  const tStaff = useTranslations("staff");
+  const tRoles = useTranslations("roles");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   function handleToggle(userId: string) {
     startTransition(async () => {
       try {
         const result = await toggleStaffActiveAction(userId);
-        toast.success(result.isActive ? "Xodim faollashtirildi" : "Xodim deaktivatsiya qilindi");
+        toast.success(result.isActive ? tStaff("activated") : tStaff("deactivated"));
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Xatolik");
+        toast.error(err instanceof Error ? err.message : tCommon("errorOccurred"));
       }
     });
   }
@@ -39,9 +37,9 @@ export function StaffList({ staff, currentUserId }: { staff: StaffRow[]; current
     startTransition(async () => {
       try {
         await changeStaffRoleAction(userId, role as "admin" | "manager" | "consultant");
-        toast.success("Rol o'zgartirildi");
+        toast.success(tStaff("roleChanged"));
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Xatolik");
+        toast.error(err instanceof Error ? err.message : tCommon("errorOccurred"));
       }
     });
   }
@@ -55,24 +53,26 @@ export function StaffList({ staff, currentUserId }: { staff: StaffRow[]; current
         >
           <div>
             <p className="font-medium">
-              {u.name} {u._id === currentUserId && <span className="text-xs text-muted-foreground">(Siz)</span>}
+              {u.name} {u._id === currentUserId && <span className="text-xs text-muted-foreground">({tStaff("youLabel")})</span>}
             </p>
             <p className="text-sm text-muted-foreground">{u.email}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={u.isActive ? "success" : "secondary"}>{u.isActive ? "Faol" : "Faol emas"}</Badge>
+            <Badge variant={u.isActive ? "secondary" : "outline"}>
+              {u.isActive ? tStaff("active") : tStaff("inactive")}
+            </Badge>
             <Select
               value={u.role}
               onValueChange={(v) => handleRoleChange(u._id, v)}
               disabled={isPending || u._id === currentUserId}
             >
               <SelectTrigger className="h-9 w-[150px]">
-                <SelectValue>{ROLE_LABELS[u.role]}</SelectValue>
+                <SelectValue>{tRoles(u.role)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="consultant">Konsultant</SelectItem>
-                <SelectItem value="manager">Menejer</SelectItem>
-                <SelectItem value="admin">Administrator</SelectItem>
+                <SelectItem value="consultant">{tRoles("consultant")}</SelectItem>
+                <SelectItem value="manager">{tRoles("manager")}</SelectItem>
+                <SelectItem value="admin">{tRoles("admin")}</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -81,7 +81,7 @@ export function StaffList({ staff, currentUserId }: { staff: StaffRow[]; current
               onClick={() => handleToggle(u._id)}
               disabled={isPending || u._id === currentUserId}
             >
-              {u.isActive ? "Deaktivatsiya" : "Faollashtirish"}
+              {u.isActive ? tStaff("deactivateButton") : tStaff("activateButton")}
             </Button>
           </div>
         </div>

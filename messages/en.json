@@ -65,7 +65,8 @@
     "expired": "Expired",
     "urgent": "Urgent",
     "warning": "Warning",
-    "normal": "Normal"
+    "normal": "Normal",
+    "day": "day"
   },
   "clients": {
     "title": "Clients",

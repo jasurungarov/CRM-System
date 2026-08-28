@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
 import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
-import { verifyAuthToken } from "@/lib/jwt";
 import type { UserRole } from "@/lib/enums";
+import { verifyAuthToken } from "@/lib/jwt";
+import { User } from "@/models/User";
+import { cookies } from "next/headers";
 
 export type SessionUser = {
   id: string;
@@ -20,7 +20,11 @@ export async function getSession(): Promise<SessionUser | null> {
   if (!token) return null;
 
   const payload = await verifyAuthToken(token);
-  if (!payload || typeof payload.userId !== "string" || !OBJECT_ID_REGEX.test(payload.userId)) {
+  if (
+    !payload ||
+    typeof payload.userId !== "string" ||
+    !OBJECT_ID_REGEX.test(payload.userId)
+  ) {
     return null;
   }
 
@@ -52,7 +56,9 @@ export async function clearSessionCookie() {
   cookieStore.delete(SESSION_COOKIE);
 }
 
-export async function requireRole(allowedRoles: UserRole[]): Promise<SessionUser> {
+export async function requireRole(
+  allowedRoles: UserRole[],
+): Promise<SessionUser> {
   const session = await getSession();
   if (!session) {
     throw new Error("AUTH_REQUIRED");

@@ -1,17 +1,20 @@
 import {
-  getMonthlyRevenueReport,
   getApplicationsFunnelReport,
-  getConsultantPerformanceReport,
   getClientsExportData,
+  getConsultantPerformanceReport,
+  getMonthlyRevenueReport,
   getPaymentsExportData,
 } from "@/actions/reports.actions";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { RevenueChart } from "@/components/reports/RevenueChart";
 import { ApplicationsFunnelChart } from "@/components/reports/ApplicationsFunnelChart";
 import { ConsultantPerformanceTable } from "@/components/reports/ConsultantPerformanceTable";
 import { ExcelExportButton } from "@/components/reports/ExcelExportButton";
+import { RevenueChart } from "@/components/reports/RevenueChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 
 export default async function ReportsPage() {
+  const tReports = await getTranslations("reports");
+
   const [revenue, funnel, performance] = await Promise.all([
     getMonthlyRevenueReport(),
     getApplicationsFunnelReport(),
@@ -21,24 +24,32 @@ export default async function ReportsPage() {
   const totalRevenue = revenue.reduce((sum, m) => sum + m.revenue, 0);
   const totalApplications = funnel.reduce((sum, f) => sum + f.count, 0);
 
+  const formattedRevenue = totalRevenue.toLocaleString("uz-UZ");
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-display font-semibold sm:text-2xl">Hisobotlar</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Joriy yil: {totalRevenue.toLocaleString("uz-UZ")} so&apos;m tushum · {totalApplications} ta ariza
+          <h1 className="text-xl font-display font-semibold sm:text-2xl">
+            {tReports("title")}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {tReports("subtitle", {
+              revenue: formattedRevenue,
+              count: totalApplications,
+            })}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <ExcelExportButton
-            label="Mijozlar (Excel)"
+            label={tReports("exportClients")}
             fileName="mijozlar-royxati"
             sheetName="Mijozlar"
             fetchData={getClientsExportData}
           />
           <ExcelExportButton
-            label="To'lovlar (Excel)"
+            label={tReports("exportPayments")}
             fileName="tolovlar-royxati"
             sheetName="To'lovlar"
             fetchData={getPaymentsExportData}
@@ -49,7 +60,9 @@ export default async function ReportsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Oylik tushum ({new Date().getFullYear()})</CardTitle>
+            <CardTitle>
+              {tReports("revenueChartTitle", { year: currentYear })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <RevenueChart data={revenue} />
@@ -57,7 +70,7 @@ export default async function ReportsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Arizalar holati bo&apos;yicha taqsimot</CardTitle>
+            <CardTitle>{tReports("funnelChartTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ApplicationsFunnelChart data={funnel} />
@@ -67,7 +80,7 @@ export default async function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Konsultantlar samaradorligi</CardTitle>
+          <CardTitle>{tReports("performanceTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ConsultantPerformanceTable data={performance} />

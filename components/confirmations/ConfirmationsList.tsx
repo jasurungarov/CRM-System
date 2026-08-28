@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Ban, Send, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -25,24 +26,26 @@ type ConfirmationRow = {
   };
 };
 
-const STATUS_CONFIG: Record<string, { label: string; variant: "secondary" | "accent" | "success" | "destructive" }> = {
-  yuborildi: { label: "Yuborildi", variant: "accent" },
-  tasdiqlandi: { label: "Tasdiqlandi", variant: "success" },
-  muddati_otgan: { label: "Muddati o'tgan", variant: "destructive" },
-  bekor_qilingan: { label: "Bekor qilingan", variant: "secondary" },
-};
-
 export function ConfirmationsList({ confirmations }: { confirmations: ConfirmationRow[] }) {
+  const t = useTranslations("confirmations");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
+  const STATUS_CONFIG: Record<string, { label: string; variant: "secondary" | "accent" | "success" | "destructive" }> = {
+    yuborildi: { label: t("statusSent"), variant: "accent" },
+    tasdiqlandi: { label: t("statusConfirmed"), variant: "success" },
+    muddati_otgan: { label: t("statusExpired"), variant: "destructive" },
+    bekor_qilingan: { label: t("statusCancelled"), variant: "secondary" },
+  };
+
   function handleCancel(id: string) {
-    if (!window.confirm("Ushbu shartnomani bekor qilmoqchimisiz?")) return;
+    if (!window.confirm(t("cancelConfirmPrompt"))) return;
     startTransition(async () => {
       try {
         await cancelConfirmationAction(id);
-        toast.success("Bekor qilindi");
+        toast.success(t("cancelled"));
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Xatolik");
+        toast.error(err instanceof Error ? err.message : tCommon("errorOccurred"));
       }
     });
   }
@@ -51,9 +54,9 @@ export function ConfirmationsList({ confirmations }: { confirmations: Confirmati
     startTransition(async () => {
       try {
         await resendTelegramAction(id);
-        toast.success("Telegram orqali qayta yuborildi");
+        toast.success(t("telegramResent"));
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Xatolik");
+        toast.error(err instanceof Error ? err.message : tCommon("errorOccurred"));
       }
     });
   }
@@ -61,7 +64,7 @@ export function ConfirmationsList({ confirmations }: { confirmations: Confirmati
   if (confirmations.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-        Hozircha shartnomalar yo&apos;q
+        {tCommon("noResults")}
       </div>
     );
   }
@@ -87,7 +90,7 @@ export function ConfirmationsList({ confirmations }: { confirmations: Confirmati
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label="PDF"
+                aria-label={t("pdf")}
                 onClick={() =>
                   downloadContractPdf({
                     contractNumber: c.contractNumber,
@@ -101,12 +104,12 @@ export function ConfirmationsList({ confirmations }: { confirmations: Confirmati
                 <FileDown className="h-4 w-4" />
               </Button>
               {effectiveStatus === "yuborildi" && c.telegramChatId && (
-                <Button variant="ghost" size="icon" aria-label="Qayta yuborish" onClick={() => handleResend(c._id)} disabled={isPending}>
+                <Button variant="ghost" size="icon" aria-label={t("resend")} onClick={() => handleResend(c._id)} disabled={isPending}>
                   <Send className="h-4 w-4" />
                 </Button>
               )}
               {effectiveStatus === "yuborildi" && (
-                <Button variant="ghost" size="icon" aria-label="Bekor qilish" onClick={() => handleCancel(c._id)} disabled={isPending}>
+                <Button variant="ghost" size="icon" aria-label={tCommon("cancel")} onClick={() => handleCancel(c._id)} disabled={isPending}>
                   <Ban className="h-4 w-4 text-destructive" />
                 </Button>
               )}
