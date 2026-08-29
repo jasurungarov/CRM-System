@@ -2,12 +2,13 @@
 
 import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { KeyRound, LogOut, UserRound } from "lucide-react";
+import { KeyRound, LogOut, Send, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { MobileNav } from "./MobileNav";
 import { NotificationBell } from "./NotificationBell";
+import { TelegramLinkModal } from '../auth/TelegramLinkModal'
 
 type Role = "admin" | "manager" | "consultant";
 
@@ -22,6 +23,7 @@ export function Navbar({
 }) {
   const t = useTranslations();
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 lg:px-6">
@@ -59,6 +61,13 @@ export function Navbar({
               {t("nav.changePassword")}
             </DropdownMenu.Item>
             <DropdownMenu.Item
+              onSelect={() => setTelegramModalOpen(true)}
+              className="flex cursor-pointer items-center gap-2 rounded-sm px-2.5 py-2 text-sm outline-none hover:bg-secondary"
+            >
+              <Send className="h-4 w-4" />
+              Telegramni ulash
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
               onSelect={onLogout}
               className="flex cursor-pointer items-center gap-2 rounded-sm px-2.5 py-2 text-sm text-destructive outline-none hover:bg-destructive/10">
               <LogOut className="h-4 w-4" />
@@ -72,6 +81,8 @@ export function Navbar({
         open={passwordModalOpen}
         onOpenChange={setPasswordModalOpen}
       />
+      <TelegramLinkModal open={telegramModalOpen} onOpenChange={setTelegramModalOpen} />
+    
     </header>
   );
 }

@@ -13,7 +13,8 @@
     "logout": "Chiqish",
     "changePassword": "Parolni almashtirish",
     "currentPassword": "Joriy parol",
-    "newPassword": "Yangi parol (kamida 8 belgi)"
+    "newPassword": "Yangi parol (kamida 8 belgi)",
+    "leads": "SRM"
   },
   "auth": {
     "loginTitle": "Tizimga kirish",

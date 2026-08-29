@@ -9,6 +9,7 @@ import {
   BarChart3,
   History,
   UserCog,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,6 +17,7 @@ export type NavItem = {
   href: string;
   labelKey:
     | "dashboard"
+    | "leads"
     | "clients"
     | "applications"
     | "payments"
@@ -32,6 +34,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
+  { href: "/leads", labelKey: "leads", icon: TrendingUp },
   { href: "/clients", labelKey: "clients", icon: Users },
   { href: "/applications", labelKey: "applications", icon: FileText },
   { href: "/payments", labelKey: "payments", icon: Wallet },

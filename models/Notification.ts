@@ -8,6 +8,7 @@ export interface INotification {
   clientId?: Types.ObjectId;
   clientName?: string;
   clientPin?: string;
+  leadId?: Types.ObjectId;
   title: string;
   message: string;
   type: NotificationType;
@@ -36,6 +37,7 @@ const NotificationSchema = new Schema<INotification>(
     clientId: { type: Schema.Types.ObjectId, ref: "Client" },
     clientName: { type: String },
     clientPin: { type: String },
+    leadId: { type: Schema.Types.ObjectId, ref: "Lead" },
     title: { type: String, required: true },
     message: { type: String, required: true },
     type: { type: String, required: true, default: "system_alert" },

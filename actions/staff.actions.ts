@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { AuditLog } from "@/models/AuditLog";
-import { requireRole } from "@/lib/auth";
+import { getSession, requireRole } from "@/lib/auth";
 
 export async function getStaffList() {
   await requireRole(["admin"]);
@@ -118,6 +118,40 @@ export async function changeStaffRoleAction(userId: string, newRole: "admin" | "
     details: `${user.name}: "${prevRole}" → "${newRole}"`,
     changes: [{ field: "role", oldValue: prevRole, newValue: newRole }],
   });
+
+  revalidatePath("/staff");
+  return { success: true };
+}
+
+
+const telegramLinkSchema = z.object({
+  telegramChatId: z.string().min(1, "Telegram Chat ID kiritilishi shart"),
+});
+
+export type TelegramLinkState = { error?: string; success?: boolean };
+
+/** Xodim o'zining Telegram Chat ID'sini ulaydi (yoki admin boshqa xodimnikini o'zgartiradi) */
+export async function updateTelegramChatIdAction(
+  _prev: TelegramLinkState,
+  formData: FormData
+): Promise<TelegramLinkState> {
+  const session = await getSession();
+  if (!session) return { error: "Sessiya tugagan, qayta kiring" };
+
+  const requestedUserId = (formData.get("userId") as string) || session.id;
+  if (requestedUserId !== session.id && session.role !== "admin") {
+    return { error: "Ruxsat yo'q" };
+  }
+
+  const parsed = telegramLinkSchema.safeParse({ telegramChatId: formData.get("telegramChatId") });
+  if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Ma'lumot noto'g'ri" };
+
+  await connectDB();
+  const user = await User.findById(requestedUserId);
+  if (!user) return { error: "Foydalanuvchi topilmadi" };
+
+  user.telegramChatId = parsed.data.telegramChatId.trim();
+  await user.save();
 
   revalidatePath("/staff");
   return { success: true };

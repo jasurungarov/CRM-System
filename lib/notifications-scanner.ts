@@ -5,6 +5,11 @@ import { Notification } from "@/models/Notification";
 import { AuditLog } from "@/models/AuditLog";
 import { CronJobLog } from "@/models/CronJobLog";
 import { getOrCreateSystemUser } from "@/lib/system-user";
+import { Lead } from "@/models/Lead";
+import { sendTelegramMessage } from "@/lib/telegram";
+import { LEAD_STATUS_LABELS, EDUCATION_LEVEL_LABELS } from "@/lib/lead-labels";
+import { User } from '@/models'
+
 
 export interface ScanResult {
   success: boolean;
@@ -184,4 +189,78 @@ export async function runPaymentReminderScan(
     remindersCreated,
     details: `${clients.length} ta mijoz tekshirildi, ${remindersCreated} ta eslatma yuborildi.`,
   };
+}
+
+export interface LeadReminderResult {
+  success: boolean;
+  leadsScanned: number;
+  remindersSent: number;
+}
+
+/**
+ * "Keyingi aloqa sanasi" bugun yoki o'tib ketgan barcha lidlar bo'yicha
+ * biriktirilgan konsultantga (1) Telegram orqali to'liq ma'lumot bilan
+ * xabar yuboradi, (2) tizim ichida shaxsiy bildirishnoma yaratadi.
+ * Kuniga bitta lid uchun bitta marta (dedupe).
+ */
+export async function runLeadReminderScan(): Promise<LeadReminderResult> {
+  await connectDB();
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+  const leads = await Lead.find({
+    nextContactDate: { $lte: todayEnd },
+    status: { $nin: ["tayyor", "rad_etdi"] },
+    convertedToClientId: { $exists: false },
+  });
+
+  let remindersSent = 0;
+
+  for (const lead of leads) {
+    const alreadyToday = await Notification.exists({
+      leadId: lead._id,
+      type: "lead_reminder",
+      createdAt: { $gte: todayStart },
+    });
+    if (alreadyToday) continue;
+
+    const consultant = await User.findById(lead.assignedTo);
+    if (!consultant) continue;
+
+    const educationLabel = EDUCATION_LEVEL_LABELS[lead.educationLevel] ?? lead.educationLevel;
+    const statusLabel = LEAD_STATUS_LABELS[lead.status] ?? lead.status;
+
+    const messageText =
+      `👤 ${consultant.name}, bugun siz ${lead.fullName} bilan bog'lanishingiz kerak edi.\n\n` +
+      `📞 Telefon: ${lead.phone}\n` +
+      (lead.telegramUsername ? `✈️ Telegram: ${lead.telegramUsername}\n` : "") +
+      (lead.telegramPhone ? `📱 Telegram raqami: ${lead.telegramPhone}\n` : "") +
+      `🌍 Davlat: ${lead.country || "—"}\n` +
+      `🎓 Yo'nalish: ${lead.direction || "—"}\n` +
+      `📚 Ta'lim darajasi: ${educationLabel}\n` +
+      `📌 Holat: ${statusLabel}\n` +
+      (lead.objection ? `📝 Oxirgi izoh: "${lead.objection}"\n` : "") +
+      (lead.lastResult ? `📊 Oldingi natija: ${lead.lastResult}\n` : "") +
+      `\n🔗 Tizimda ko'rish: ${process.env.APP_URL || "http://localhost:3000"}/leads`;
+
+    if (consultant.telegramChatId) {
+      await sendTelegramMessage(consultant.telegramChatId, messageText);
+    }
+
+    await Notification.create({
+      recipientId: String(consultant._id),
+      recipientRole: "all",
+      leadId: lead._id,
+      title: `Bugun bog'lanish kerak: ${lead.fullName}`,
+      message: messageText,
+      type: "lead_reminder",
+      priority: "yuqori",
+      link: "/leads",
+    });
+
+    remindersSent++;
+  }
+
+  return { success: true, leadsScanned: leads.length, remindersSent };
 }

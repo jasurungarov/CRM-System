@@ -13,7 +13,8 @@
     "logout": "Logout",
     "changePassword": "Change password",
     "currentPassword": "Current password",
-    "newPassword": "New password (at least 8 characters)"
+    "newPassword": "New password (at least 8 characters)",
+    "leads": "SRM"
   },
   "auth": {
     "loginTitle": "Sign In",

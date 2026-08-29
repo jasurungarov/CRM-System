@@ -13,7 +13,8 @@
     "logout": "Выйти",
     "changePassword": "Сменить пароль",
     "currentPassword": "Текущий пароль",
-    "newPassword": "Новый пароль (минимум 8 символов)"
+    "newPassword": "Новый пароль (минимум 8 символов)",
+    "leads": "SRM"
   },
   "auth": {
     "loginTitle": "Вход в систему",

@@ -46,7 +46,8 @@ export type NotificationType =
   | "contract_pending"
   | "contract_accepted"
   | "system_alert"
-  | "status_change";
+  | "status_change"
+  | "lead_reminder";
 
 export type NotificationPriority = "shoshilinch" | "yuqori" | "orta" | "past";
 
@@ -61,3 +62,13 @@ export type AuditCategory =
   | "system";
 
 export type AuditSeverity = "info" | "warning" | "danger" | "critical";
+
+
+export type LeadStatus = "yangi" | "boglanildi" | "qiziqmoqda" | "tayyor" | "rad_etdi";
+
+export type EducationLevel =
+  | "maktab_bitiruvchisi"
+  | "kollej_litsey"
+  | "bakalavriat"
+  | "magistratura"
+  | "boshqa";

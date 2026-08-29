@@ -10,3 +10,4 @@ export { PasswordResetToken } from "./PasswordResetToken";
 export { LoginAttempt } from "./LoginAttempt";
 export { Counter } from "./Counter";
 export { AuditLog } from "./AuditLog";
+export { Lead } from "./Lead";

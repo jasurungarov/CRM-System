@@ -8,6 +8,7 @@ export interface IUser {
   passwordHash: string;
   role: UserRole;
   isActive: boolean;
+  telegramChatId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +31,7 @@ const UserSchema = new Schema<IUser>(
       default: "consultant",
     },
     isActive: { type: Boolean, default: true },
+    telegramChatId: { type: String },
   },
   { timestamps: true }
 );

@@ -6,7 +6,7 @@ import { connectDB } from "@/lib/db";
 import { Notification } from "@/models/Notification";
 import { AuditLog } from "@/models/AuditLog";
 import { getSession, requireRole } from "@/lib/auth";
-import { runDeadlineScan, runPaymentReminderScan } from "@/lib/notifications-scanner";
+import { runDeadlineScan, runPaymentReminderScan, runLeadReminderScan } from "@/lib/notifications-scanner";
 
 /**
  * Foydalanuvchiga tegishli bildirishnomalar:
@@ -86,16 +86,20 @@ export async function markAllAsReadAction() {
 /** Admin/menejer skanerlarni qo'lda ishga tushirishi mumkin (Vercel Cron kutmasdan) */
 export async function runManualScanAction() {
   await requireRole(["admin", "manager"]);
-  const [deadlineResult, reminderResult] = await Promise.all([
+  const [deadlineResult, reminderResult, leadResult] = await Promise.all([
     runDeadlineScan("manual"),
     runPaymentReminderScan("manual"),
+    runLeadReminderScan("manual"),
   ]);
   revalidatePath("/notifications");
   return {
-    notificationsCreated: deadlineResult.notificationsCreated + reminderResult.remindersCreated,
+    notificationsCreated:
+      deadlineResult.notificationsCreated + reminderResult.remindersCreated + leadResult.remindersSent,
     deadlinesScanned: deadlineResult.deadlinesScanned,
     remindersCreated: reminderResult.remindersCreated,
     clientsScanned: reminderResult.clientsScanned,
+    leadsScanned: leadResult.leadsScanned,
+    leadRemindersSent: leadResult.remindersSent,
   };
 }
 
