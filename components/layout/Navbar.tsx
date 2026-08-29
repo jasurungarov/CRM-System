@@ -2,28 +2,31 @@
 
 import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { KeyRound, LogOut, Send, UserRound } from "lucide-react";
+import { CheckCircle2, KeyRound, LogOut, Send, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { TelegramLinkModal } from "../auth/TelegramLinkModal";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { MobileNav } from "./MobileNav";
 import { NotificationBell } from "./NotificationBell";
-import { TelegramLinkModal } from '../auth/TelegramLinkModal'
 
 type Role = "admin" | "manager" | "consultant";
 
 export function Navbar({
   role,
   fullName,
+  telegramChatId,
   onLogout,
 }: {
   role: Role;
   fullName: string;
+  telegramChatId: string | null;
   onLogout: () => void;
 }) {
   const t = useTranslations();
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [telegramModalOpen, setTelegramModalOpen] = useState(false);
+  const isTelegramLinked = Boolean(telegramChatId);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 lg:px-6">
@@ -62,10 +65,14 @@ export function Navbar({
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onSelect={() => setTelegramModalOpen(true)}
-              className="flex cursor-pointer items-center gap-2 rounded-sm px-2.5 py-2 text-sm outline-none hover:bg-secondary"
-            >
-              <Send className="h-4 w-4" />
-              Telegramni ulash
+              className="flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2.5 py-2 text-sm outline-none hover:bg-secondary">
+              <span className="flex items-center gap-2">
+                <Send className="h-4 w-4" />
+                {isTelegramLinked ? "Telegram ulangan" : "Telegramni ulash"}
+              </span>
+              {isTelegramLinked && (
+                <CheckCircle2 className="h-4 w-4 text-success" />
+              )}
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onSelect={onLogout}
@@ -81,8 +88,11 @@ export function Navbar({
         open={passwordModalOpen}
         onOpenChange={setPasswordModalOpen}
       />
-      <TelegramLinkModal open={telegramModalOpen} onOpenChange={setTelegramModalOpen} />
-    
+      <TelegramLinkModal
+        open={telegramModalOpen}
+        onOpenChange={setTelegramModalOpen}
+        currentChatId={telegramChatId}
+      />
     </header>
   );
 }

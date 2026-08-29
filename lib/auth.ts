@@ -9,6 +9,7 @@ export type SessionUser = {
   email: string;
   fullName: string;
   role: UserRole;
+  telegramChatId: string | null;
 };
 
 const SESSION_COOKIE = "session";
@@ -37,6 +38,7 @@ export async function getSession(): Promise<SessionUser | null> {
     email: user.email,
     fullName: user.name,
     role: user.role,
+    telegramChatId: user.telegramChatId ?? null,
   };
 }
 

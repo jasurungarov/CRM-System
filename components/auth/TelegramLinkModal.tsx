@@ -27,7 +27,15 @@ function SubmitButton() {
   );
 }
 
-export function TelegramLinkModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function TelegramLinkModal({
+  open,
+  onOpenChange,
+  currentChatId,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  currentChatId: string | null;
+}) {
   const [state, formAction] = useActionState<TelegramLinkState, FormData>(updateTelegramChatIdAction, {});
 
   useEffect(() => {
@@ -43,17 +51,24 @@ export function TelegramLinkModal({ open, onOpenChange }: { open: boolean; onOpe
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-4 w-4" />
-            Telegramni ulash
+            {currentChatId ? "Telegram ulangan" : "Telegramni ulash"}
           </DialogTitle>
           <DialogDescription>
-            Avval firma botiga kirib &quot;Start&quot; bosing, so&apos;ng @userinfobot orqali o&apos;z Chat ID
-            raqamingizni oling va shu yerga kiriting.
+            {currentChatId
+              ? "Telegram allaqachon ulangan. ID'ni o'zgartirish uchun yangisini kiriting va saqlang."
+              : "Avval firma botiga kirib \"Start\" bosing, so'ng @userinfobot orqali o'z Chat ID raqamingizni oling va shu yerga kiriting."}
           </DialogDescription>
         </DialogHeader>
         <form action={formAction} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="telegramChatId">Telegram Chat ID</Label>
-            <Input id="telegramChatId" name="telegramChatId" placeholder="masalan: 123456789" required />
+            <Input
+              id="telegramChatId"
+              name="telegramChatId"
+              placeholder="masalan: 123456789"
+              defaultValue={currentChatId ?? ""}
+              required
+            />
           </div>
           {state.error && <p className="text-sm text-destructive">{state.error}</p>}
           <DialogFooter>

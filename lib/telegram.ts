@@ -42,3 +42,11 @@ export function buildTelegramShareUrl(link: string, text: string): string {
   const params = new URLSearchParams({ url: link, text });
   return `https://t.me/share/url?${params.toString()}`;
 }
+
+/** Telegram HTML parse_mode uchun xavfli belgilarni ekranlaydi */
+export function escapeTelegramHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}

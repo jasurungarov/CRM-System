@@ -9,6 +9,7 @@ export function NavbarWithLogout({ user }: { user: SessionUser }) {
     <Navbar
       role={user.role}
       fullName={user.fullName}
+      telegramChatId={user.telegramChatId}
       onLogout={() => {
         void signOutAction();
       }}

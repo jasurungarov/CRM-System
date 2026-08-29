@@ -6,10 +6,9 @@ import { AuditLog } from "@/models/AuditLog";
 import { CronJobLog } from "@/models/CronJobLog";
 import { getOrCreateSystemUser } from "@/lib/system-user";
 import { Lead } from "@/models/Lead";
-import { sendTelegramMessage } from "@/lib/telegram";
 import { LEAD_STATUS_LABELS, EDUCATION_LEVEL_LABELS } from "@/lib/lead-labels";
 import { User } from '@/models'
-
+import { sendTelegramMessage, escapeTelegramHtml } from "@/lib/telegram";
 
 export interface ScanResult {
   success: boolean;
@@ -230,19 +229,20 @@ export async function runLeadReminderScan(): Promise<LeadReminderResult> {
 
     const educationLabel = EDUCATION_LEVEL_LABELS[lead.educationLevel] ?? lead.educationLevel;
     const statusLabel = LEAD_STATUS_LABELS[lead.status] ?? lead.status;
+    const appUrl = process.env.APP_URL;
 
     const messageText =
-      `👤 ${consultant.name}, bugun siz ${lead.fullName} bilan bog'lanishingiz kerak edi.\n\n` +
-      `📞 Telefon: ${lead.phone}\n` +
-      (lead.telegramUsername ? `✈️ Telegram: ${lead.telegramUsername}\n` : "") +
-      (lead.telegramPhone ? `📱 Telegram raqami: ${lead.telegramPhone}\n` : "") +
-      `🌍 Davlat: ${lead.country || "—"}\n` +
-      `🎓 Yo'nalish: ${lead.direction || "—"}\n` +
-      `📚 Ta'lim darajasi: ${educationLabel}\n` +
-      `📌 Holat: ${statusLabel}\n` +
-      (lead.objection ? `📝 Oxirgi izoh: "${lead.objection}"\n` : "") +
-      (lead.lastResult ? `📊 Oldingi natija: ${lead.lastResult}\n` : "") +
-      `\n🔗 Tizimda ko'rish: ${process.env.APP_URL || "http://localhost:3000"}/leads`;
+      `👤 ${escapeTelegramHtml(consultant.name)}, bugun siz ${escapeTelegramHtml(lead.fullName)} bilan bog'lanishingiz kerak edi.\n\n` +
+      `📞 Telefon: ${escapeTelegramHtml(lead.phone)}\n` +
+      (lead.telegramUsername ? `✈️ Telegram: ${escapeTelegramHtml(lead.telegramUsername)}\n` : "") +
+      (lead.telegramPhone ? `📱 Telegram raqami: ${escapeTelegramHtml(lead.telegramPhone)}\n` : "") +
+      `🌍 Davlat: ${escapeTelegramHtml(lead.country || "—")}\n` +
+      `🎓 Yo'nalish: ${escapeTelegramHtml(lead.direction || "—")}\n` +
+      `📚 Ta'lim darajasi: ${escapeTelegramHtml(educationLabel)}\n` +
+      `📌 Holat: ${escapeTelegramHtml(statusLabel)}\n` +
+      (lead.objection ? `📝 Oxirgi izoh: "${escapeTelegramHtml(lead.objection)}"\n` : "") +
+      (lead.lastResult ? `📊 Oldingi natija: ${escapeTelegramHtml(lead.lastResult)}\n` : "") +
+      `\n🔗 <a href="${appUrl}/leads">Tizimda ko'rish</a>`;
 
     if (consultant.telegramChatId) {
       await sendTelegramMessage(consultant.telegramChatId, messageText);
