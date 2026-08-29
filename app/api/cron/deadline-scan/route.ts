@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const [deadlineResult, reminderResult, leadResult] = await Promise.all([
     runDeadlineScan(triggeredBy),
     runPaymentReminderScan(triggeredBy),
-    runLeadReminderScan(triggeredBy),
+    runLeadReminderScan(),
   ]);
 
   return NextResponse.json({ success: true, deadlineResult, reminderResult, leadResult });

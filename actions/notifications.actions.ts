@@ -89,7 +89,7 @@ export async function runManualScanAction() {
   const [deadlineResult, reminderResult, leadResult] = await Promise.all([
     runDeadlineScan("manual"),
     runPaymentReminderScan("manual"),
-    runLeadReminderScan("manual"),
+    runLeadReminderScan(),
   ]);
   revalidatePath("/notifications");
   return {
