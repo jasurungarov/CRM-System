@@ -1,20 +1,5 @@
 const TELEGRAM_API = "https://api.telegram.org";
 
-/**
- * Telegram Bot API orqali xabar yuboradi.
- *
- * ESLATMA: bu ishlashi uchun (1) .env'da TELEGRAM_BOT_TOKEN to'ldirilgan
- * bo'lishi va (2) mijozning shu bot bilan avval /start bosgan bo'lishi va
- * uning Telegram chat ID'si ClientConfirmation.telegramChatId maydonida
- * saqlangan bo'lishi kerak (chat ID botga /start bosilganda bot serverida
- * ko'rinadi — hozircha xodim buni qo'lda kiritadi; kelajakda buni avtomatik
- * bog'lash uchun bot webhook + mijoz profiliga "Telegram ulash" tugmasi
- * qo'shish mumkin).
- *
- * Agar chat ID mavjud bo'lmasa, tizim "Telegram orqali ulashish" havolasi
- * (t.me/share/url) orqali xodimning o'z Telegramidan yuborishini taklif
- * qiladi — bu holatda serverga ulanish shart emas.
- */
 export async function sendTelegramMessage(chatId: string, text: string): Promise<{ ok: boolean; error?: string }> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {

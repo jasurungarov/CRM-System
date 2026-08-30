@@ -1,38 +1,60 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { useFormStatus } from "react-dom";
-import { Plus } from "lucide-react";
+import { createLeadAction, type LeadFormState } from "@/actions/leads.actions";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { createLeadAction, type LeadFormState } from "@/actions/leads.actions";
-import { EDUCATION_LEVEL_LABELS } from "@/lib/lead-labels";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useActionState, useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
+
+const EDUCATION_OPTIONS = [
+  { value: "maktab", key: "educationMaktab" },
+  { value: "kollej", key: "educationKollej" },
+  { value: "bakalavriat", key: "educationBakalavriat" },
+  { value: "magistratura", key: "educationMagistratura" },
+  { value: "boshqa", key: "educationBoshqa" },
+] as const;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("leads");
+
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "Qo'shish"}
+      {pending ? "loading..." : t("addNew")}
     </Button>
   );
 }
 
 export function LeadFormModal() {
+  const t = useTranslations("leads");
+  const tTelegram = useTranslations("telegramLink");
+
   const [open, setOpen] = useState(false);
   const [educationLevel, setEducationLevel] = useState("boshqa");
-  const [state, formAction] = useActionState<LeadFormState, FormData>(createLeadAction, {});
+  const [state, formAction] = useActionState<LeadFormState, FormData>(
+    createLeadAction,
+    {},
+  );
 
   useEffect(() => {
     if (state.success) setOpen(false);
@@ -43,58 +65,65 @@ export function LeadFormModal() {
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4" />
-          Yangi lid
+          {t("addNew")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Yangi lid qo&apos;shish</DialogTitle>
-          <DialogDescription>Hali shartnoma tuzmagan, lekin qiziqish bildirgan aloqa</DialogDescription>
+          <DialogTitle>{t("addTitle")}</DialogTitle>
+          <DialogDescription>{t("addDesc")}</DialogDescription>
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="fullName">Ismi</Label>
+            <Label htmlFor="fullName">{t("fullName")}</Label>
             <Input id="fullName" name="fullName" required />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Telefon</Label>
+              <Label htmlFor="phone">{t("phone")}</Label>
               <Input id="phone" name="phone" placeholder="+998" required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="telegramUsername">Telegram username</Label>
-              <Input id="telegramUsername" name="telegramUsername" placeholder="@username" />
+              <Label htmlFor="telegramUsername">{t("telegramUsername")}</Label>
+              <Input
+                id="telegramUsername"
+                name="telegramUsername"
+                placeholder="@username"
+              />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="telegramPhone">Telegram raqami (agar username bo&apos;lmasa)</Label>
+            <Label htmlFor="telegramPhone">{t("telegramPhone")}</Label>
             <Input id="telegramPhone" name="telegramPhone" placeholder="+998" />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="country">Qiziqqan davlat</Label>
-              <Input id="country" name="country" placeholder="masalan: Saudiya Arabistoni" />
+              <Label htmlFor="country">{t("country")}</Label>
+              <Input id="country" name="country" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="direction">Yo&apos;nalish</Label>
-              <Input id="direction" name="direction" placeholder="masalan: Tibbiyot" />
+              <Label htmlFor="direction">{t("direction")}</Label>
+              <Input id="direction" name="direction" />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Ta&apos;lim darajasi</Label>
-            <Select name="educationLevel" value={educationLevel} onValueChange={setEducationLevel}>
+            <Label>{t("educationLevel")}</Label>
+            <Select
+              name="educationLevel"
+              value={educationLevel}
+              onValueChange={setEducationLevel}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(EDUCATION_LEVEL_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
+                {EDUCATION_OPTIONS.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {t(item.key)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -103,17 +132,21 @@ export function LeadFormModal() {
 
           {educationLevel === "boshqa" && (
             <div className="space-y-1.5">
-              <Label htmlFor="educationLevelOther">Ta&apos;lim darajasi haqida qo&apos;shimcha</Label>
+              <Label htmlFor="educationLevelOther">
+                {t("educationLevelOther")}
+              </Label>
               <Input id="educationLevelOther" name="educationLevelOther" />
             </div>
           )}
 
-          {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+          {state.error && (
+            <p className="text-sm text-destructive">{state.error}</p>
+          )}
 
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {tTelegram("cancel")}
               </Button>
             </DialogClose>
             <SubmitButton />

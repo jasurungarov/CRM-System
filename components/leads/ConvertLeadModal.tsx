@@ -1,30 +1,42 @@
 "use client";
 
+import {
+  convertLeadToClientAction,
+  type ConvertLeadFormState,
+} from "@/actions/leads.actions";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowRightCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
-import { ArrowRightCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { convertLeadToClientAction, type ConvertLeadFormState } from "@/actions/leads.actions";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("leads");
+
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "Mijoz sifatida yaratish"}
+      {pending ? "..." : t("convertSubmit")}
     </Button>
   );
 }
@@ -44,29 +56,35 @@ export function ConvertLeadModal({
   tariffs: Array<{ _id: string; name: string; price: number }>;
   consultants: Array<{ id: string; name: string }>;
 }) {
+  const t = useTranslations("leads");
+  const tTelegram = useTranslations("telegramLink");
+
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useActionState<ConvertLeadFormState, FormData>(convertLeadToClientAction, {});
+  const [state, formAction] = useActionState<ConvertLeadFormState, FormData>(
+    convertLeadToClientAction,
+    {},
+  );
 
   useEffect(() => {
     if (state.success) {
-      toast.success(`${leadName} mijozga aylantirildi`);
+      toast.success(t("convertSuccess", { name: leadName }));
       setOpen(false);
     }
-  }, [state.success, leadName]);
+  }, [state.success, leadName, t]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="accent" size="sm">
           <ArrowRightCircle className="h-4 w-4" />
-          Mijozga aylantirish
+          {t("convertButton")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mijozga aylantirish</DialogTitle>
+          <DialogTitle>{t("convertButton")}</DialogTitle>
           <DialogDescription>
-            {leadName} endi rasmiy mijoz sifatida CRM tomonga o&apos;tkaziladi.
+            {t("convertDesc", { name: leadName })}
           </DialogDescription>
         </DialogHeader>
 
@@ -74,20 +92,20 @@ export function ConvertLeadModal({
           <input type="hidden" name="leadId" value={leadId} />
 
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("convertEmail")}</Label>
             <Input id="email" name="email" type="email" required />
           </div>
 
           <div className="space-y-1.5">
-            <Label>Tarif</Label>
+            <Label>{t("convertTariff")}</Label>
             <Select name="tariffId">
               <SelectTrigger>
-                <SelectValue placeholder="Tarif tanlang" />
+                <SelectValue placeholder={t("convertSelectTariff")} />
               </SelectTrigger>
               <SelectContent>
-                {tariffs.map((t) => (
-                  <SelectItem key={t._id} value={t._id}>
-                    {t.name} — {t.price.toLocaleString("uz-UZ")} so&apos;m
+                {tariffs.map((tariff) => (
+                  <SelectItem key={tariff._id} value={tariff._id}>
+                    {tariff.name} — {tariff.price.toLocaleString("uz-UZ")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -96,15 +114,15 @@ export function ConvertLeadModal({
 
           {canAssign && (
             <div className="space-y-1.5">
-              <Label>Konsultant</Label>
+              <Label>{t("convertConsultant")}</Label>
               <Select name="assignedTo" defaultValue={currentUserId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Konsultant tanlang" />
+                  <SelectValue placeholder={t("convertSelectConsultant")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {consultants.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
+                  {consultants.map((consultant) => (
+                    <SelectItem key={consultant.id} value={consultant.id}>
+                      {consultant.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -112,12 +130,14 @@ export function ConvertLeadModal({
             </div>
           )}
 
-          {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+          {state.error && (
+            <p className="text-sm text-destructive">{state.error}</p>
+          )}
 
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {tTelegram("cancel")}
               </Button>
             </DialogClose>
             <SubmitButton />

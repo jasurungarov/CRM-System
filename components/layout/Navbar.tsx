@@ -27,6 +27,7 @@ export function Navbar({
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [telegramModalOpen, setTelegramModalOpen] = useState(false);
   const isTelegramLinked = Boolean(telegramChatId);
+  const tTelegram = useTranslations("telegramLink");
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 lg:px-6">
@@ -68,7 +69,7 @@ export function Navbar({
               className="flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2.5 py-2 text-sm outline-none hover:bg-secondary">
               <span className="flex items-center gap-2">
                 <Send className="h-4 w-4" />
-                {isTelegramLinked ? "Telegram ulangan" : "Telegramni ulash"}
+                {tTelegram("menuItem")}
               </span>
               {isTelegramLinked && (
                 <CheckCircle2 className="h-4 w-4 text-success" />

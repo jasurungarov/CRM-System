@@ -1,28 +1,34 @@
 "use client";
 
+import {
+  updateTelegramChatIdAction,
+  type TelegramLinkState,
+} from "@/actions/staff.actions";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
-import { Send } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { updateTelegramChatIdAction, type TelegramLinkState } from "@/actions/staff.actions";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("telegramLink");
+
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? "..." : "Saqlash"}
+      {pending ? "loading..." : t("save")}
     </Button>
   );
 }
@@ -36,14 +42,19 @@ export function TelegramLinkModal({
   onOpenChange: (v: boolean) => void;
   currentChatId: string | null;
 }) {
-  const [state, formAction] = useActionState<TelegramLinkState, FormData>(updateTelegramChatIdAction, {});
+  const t = useTranslations("telegramLink");
+
+  const [state, formAction] = useActionState<TelegramLinkState, FormData>(
+    updateTelegramChatIdAction,
+    {},
+  );
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Telegram muvaffaqiyatli ulandi");
+      toast.success(t("success"));
       onOpenChange(false);
     }
-  }, [state.success, onOpenChange]);
+  }, [state.success, onOpenChange, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,30 +62,28 @@ export function TelegramLinkModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-4 w-4" />
-            {currentChatId ? "Telegram ulangan" : "Telegramni ulash"}
+            {t("modalTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {currentChatId
-              ? "Telegram allaqachon ulangan. ID'ni o'zgartirish uchun yangisini kiriting va saqlang."
-              : "Avval firma botiga kirib \"Start\" bosing, so'ng @userinfobot orqali o'z Chat ID raqamingizni oling va shu yerga kiriting."}
-          </DialogDescription>
+          <DialogDescription>{t("modalDesc")}</DialogDescription>
         </DialogHeader>
         <form action={formAction} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="telegramChatId">Telegram Chat ID</Label>
+            <Label htmlFor="telegramChatId">{t("chatIdLabel")}</Label>
             <Input
               id="telegramChatId"
               name="telegramChatId"
-              placeholder="masalan: 123456789"
+              placeholder={t("chatIdPlaceholder")}
               defaultValue={currentChatId ?? ""}
               required
             />
           </div>
-          {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+          {state.error && (
+            <p className="text-sm text-destructive">{state.error}</p>
+          )}
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Bekor qilish
+                {t("cancel")}
               </Button>
             </DialogClose>
             <SubmitButton />

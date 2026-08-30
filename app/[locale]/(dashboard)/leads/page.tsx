@@ -1,12 +1,12 @@
-import { Suspense } from "react";
+import { getConsultantsList, getTariffsList } from "@/actions/clients.actions";
 import { getLeads, getLeadStats } from "@/actions/leads.actions";
-import { getTariffsList, getConsultantsList } from "@/actions/clients.actions";
-import { getSession } from "@/lib/auth";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LeadFormModal } from "@/components/leads/LeadFormModal";
-import { LeadSearchBar } from "@/components/leads/LeadSearchBar";
 import { LeadList } from "@/components/leads/LeadList";
-import { LEAD_STATUS_LABELS } from "@/lib/lead-labels";
+import { LeadSearchBar } from "@/components/leads/LeadSearchBar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSession } from "@/lib/auth";
+import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 
 export default async function LeadsPage({
   searchParams,
@@ -18,6 +18,7 @@ export default async function LeadsPage({
   if (!session) return null;
 
   const canAssign = session.role === "admin" || session.role === "manager";
+  const t = await getTranslations("leads");
 
   const [leads, stats, tariffs, consultants] = await Promise.all([
     getLeads({ search, status }),
@@ -27,21 +28,31 @@ export default async function LeadsPage({
   ]);
 
   const statCards = [
-    { key: "total", label: "Jami", value: stats.total },
-    { key: "yangi", label: LEAD_STATUS_LABELS.yangi, value: stats.yangi },
-    { key: "boglanildi", label: LEAD_STATUS_LABELS.boglanildi, value: stats.boglanildi },
-    { key: "qiziqmoqda", label: LEAD_STATUS_LABELS.qiziqmoqda, value: stats.qiziqmoqda },
-    { key: "tayyor", label: LEAD_STATUS_LABELS.tayyor, value: stats.tayyor },
-    { key: "rad_etdi", label: LEAD_STATUS_LABELS.rad_etdi, value: stats.rad_etdi },
+    { key: "total", label: t("statTotal"), value: stats.total },
+    { key: "yangi", label: t("statusYangi"), value: stats.yangi },
+    {
+      key: "boglanildi",
+      label: t("statusBoglanildi"),
+      value: stats.boglanildi,
+    },
+    {
+      key: "qiziqmoqda",
+      label: t("statusQiziqmoqda"),
+      value: stats.qiziqmoqda,
+    },
+    { key: "tayyor", label: t("statusTayyor"), value: stats.tayyor },
+    { key: "rad_etdi", label: t("statusRadEtdi"), value: stats.rad_etdi },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-display font-semibold sm:text-2xl">SRM</h1>
+          <h1 className="text-xl font-display font-semibold sm:text-2xl">
+            {t("pageTitle")}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Hali shartnoma tuzmagan, qiziqish bildirgan aloqalar
+            {t("pageSubtitle")}
           </p>
         </div>
         <LeadFormModal />
@@ -51,7 +62,9 @@ export default async function LeadsPage({
         {statCards.map((s) => (
           <Card key={s.key}>
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground">{s.label}</CardTitle>
+              <CardTitle className="text-xs font-medium text-muted-foreground">
+                {s.label}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-xl font-semibold">{s.value}</p>
@@ -60,7 +73,10 @@ export default async function LeadsPage({
         ))}
       </div>
 
-      <Suspense fallback={<div className="h-10 w-full max-w-xs rounded-md bg-secondary animate-pulse" />}>
+      <Suspense
+        fallback={
+          <div className="h-10 w-full max-w-xs rounded-md bg-secondary animate-pulse" />
+        }>
         <LeadSearchBar />
       </Suspense>
 
